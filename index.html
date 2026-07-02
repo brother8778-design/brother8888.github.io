@@ -86,8 +86,14 @@
     .employee-form { display: grid; grid-template-columns: 1fr 190px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
     .employee-form input, .employee-form select, .request-form input, .request-form select, .request-form textarea, .toolbar select { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 11px; font-weight: 850; outline: none; }
     .employee-table th, .employee-table td { padding: 10px 12px; text-align: left; height: auto; }
-    .request-form { display: grid; grid-template-columns: 1fr 150px 150px 150px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
-    .request-form textarea { grid-column: 1 / -2; min-height: 74px; resize: vertical; }
+    .request-form { display: grid; grid-template-columns: 1fr 150px 150px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
+    .request-form textarea { grid-column: 1 / -1; min-height: 74px; resize: vertical; }
+    .request-calendar { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(7, minmax(36px, 1fr)); gap: 6px; }
+    .request-dow { color: #64748b; text-align: center; font-size: 12px; font-weight: 950; }
+    .request-day { min-height: 42px; border: 1px solid var(--line); border-radius: 10px; background: white; color: #334155; font-weight: 950; }
+    .request-day.blank { visibility: hidden; pointer-events: none; }
+    .request-day.selected { border-color: #4f46e5; background: #4f46e5; color: white; box-shadow: 0 8px 16px rgba(79,70,229,.2); }
+    .request-selected { grid-column: 1 / -1; color: #475569; font-size: 12px; font-weight: 900; }
     .request-card { display: grid; grid-template-columns: 1fr auto; gap: 8px; border-bottom: 1px solid #eef2f7; padding: 14px; background: white; }
     .request-main { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .request-pill { border: 1px solid var(--line); border-radius: 999px; background: #f8fafc; padding: 5px 9px; color: #475569; font-size: 12px; font-weight: 900; }
@@ -170,6 +176,8 @@
       baseDate: new Date(),
       timelineDate: new Date(),
       quick: null,
+      requestMonth: formatMonth(new Date()),
+      requestSelectedDates: [],
       employees: structuredClone(defaults),
       schedule: {},
       requests: [],
@@ -194,6 +202,24 @@
       const m = String(date.getMonth() + 1).padStart(2, '0');
       const d = String(date.getDate()).padStart(2, '0');
       return `${y}-${m}-${d}`;
+    }
+    function formatMonth(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      return `${y}-${m}`;
+    }
+    function getMonthDays(monthKey) {
+      const [year, month] = monthKey.split('-').map(Number);
+      const first = new Date(year, month - 1, 1);
+      const total = new Date(year, month, 0).getDate();
+      const leading = first.getDay();
+      return [
+        ...Array.from({ length: leading }, () => null),
+        ...Array.from({ length: total }, (_, index) => {
+          const day = String(index + 1).padStart(2, '0');
+          return `${monthKey}-${day}`;
+        })
+      ];
     }
     function holidayName(dateKey) {
       return variableHolidays[dateKey] || recurringHolidays[dateKey.slice(5)] || '';
@@ -264,6 +290,7 @@
       return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
     }
     function dateRangeLabel(item) {
+      if (Array.isArray(item.dates) && item.dates.length) return [...item.dates].sort().join('、');
       const start = item.startDate || item.date;
       const end = item.endDate || item.date;
       return start === end ? start : `${start} ~ ${end}`;
@@ -397,7 +424,19 @@
         </section>`);
     }
     function renderRequests() {
-      const sorted = [...state.requests].sort((a, b) => `${a.startDate || a.date}-${a.createdAt}`.localeCompare(`${b.startDate || b.date}-${b.createdAt}`));
+      const sorted = [...state.requests].sort((a, b) => {
+        const aDate = Array.isArray(a.dates) && a.dates.length ? [...a.dates].sort()[0] : (a.startDate || a.date);
+        const bDate = Array.isArray(b.dates) && b.dates.length ? [...b.dates].sort()[0] : (b.startDate || b.date);
+        return `${aDate}-${a.createdAt}`.localeCompare(`${bDate}-${b.createdAt}`);
+      });
+      const selectedDates = new Set(state.requestSelectedDates);
+      const calendarCells = [
+        ...['日', '一', '二', '三', '四', '五', '六'].map(day => `<div class="request-dow">${day}</div>`),
+        ...getMonthDays(state.requestMonth).map(date => date
+          ? `<button class="request-day ${selectedDates.has(date) ? 'selected' : ''}" data-request-date="${date}">${Number(date.slice(8))}</button>`
+          : '<button class="request-day blank"></button>'
+        )
+      ].join('');
       const rows = sorted.map(item => `
         <div class="request-card">
           <div>
@@ -417,12 +456,13 @@
           ${state.view === 'employee' ? `
             <div class="request-form">
               <input id="requestName" placeholder="你的姓名" />
-              <input id="requestStartDate" type="date" value="${formatDate(new Date())}" title="開始日期" />
-              <input id="requestEndDate" type="date" value="${formatDate(new Date())}" title="結束日期" />
+              <input id="requestMonth" type="month" value="${state.requestMonth}" data-action="requestMonth" title="選擇月份" />
               <select id="requestShift">
                 ${Object.values(shifts).filter(s => s.work).map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
               </select>
               <button class="primary" data-action="addRequest">送出</button>
+              <div class="request-calendar">${calendarCells}</div>
+              <div class="request-selected">已選 ${state.requestSelectedDates.length} 天：${state.requestSelectedDates.length ? [...state.requestSelectedDates].sort().join('、') : '請點選可上班日期'}</div>
               <textarea id="requestNote" placeholder="備註，例如：這幾天只能晚上、希望連排、不要太早等"></textarea>
             </div>
           ` : '<div class="notice" style="margin:12px">這裡會列出員工填寫的希望班，方便主管排班參考。</div>'}
@@ -454,12 +494,20 @@
       else renderWeekly();
     }
     document.addEventListener('click', event => {
-      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-pick],[data-delete],[data-request-delete]');
+      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-pick],[data-delete],[data-request-delete],[data-request-date]');
       if (!target) {
         if (state.selected) { state.selected = null; render(); }
         return;
       }
       if (target.dataset.tab) { state.tab = target.dataset.tab; render(); return; }
+      if (target.dataset.requestDate) {
+        const date = target.dataset.requestDate;
+        state.requestSelectedDates = state.requestSelectedDates.includes(date)
+          ? state.requestSelectedDates.filter(item => item !== date)
+          : [...state.requestSelectedDates, date].sort();
+        render();
+        return;
+      }
       if (target.dataset.quick) { state.quick = state.quick === target.dataset.quick ? null : target.dataset.quick; render(); return; }
       if (target.dataset.date && state.view === 'admin') {
         const date = target.dataset.date, emp = target.dataset.emp;
@@ -519,14 +567,12 @@
       }
       if (action === 'addRequest') {
         const name = document.getElementById('requestName').value.trim();
-        const startDate = document.getElementById('requestStartDate').value;
-        const endDate = document.getElementById('requestEndDate').value;
         const shift = document.getElementById('requestShift').value;
         const note = document.getElementById('requestNote').value.trim();
-        if (!name || !startDate || !endDate) return;
-        const normalizedStart = startDate <= endDate ? startDate : endDate;
-        const normalizedEnd = startDate <= endDate ? endDate : startDate;
-        state.requests.push({ id: 'req_' + Date.now(), name, date: normalizedStart, startDate: normalizedStart, endDate: normalizedEnd, shift, note, createdAt: formatDate(new Date()) });
+        const dates = [...state.requestSelectedDates].sort();
+        if (!name || !dates.length) return;
+        state.requests.push({ id: 'req_' + Date.now(), name, date: dates[0], dates, shift, note, createdAt: formatDate(new Date()) });
+        state.requestSelectedDates = [];
         save();
         render();
       }
@@ -534,6 +580,11 @@
     document.addEventListener('change', event => {
       if (event.target.dataset.action === 'filter') {
         state.filter = event.target.value;
+        render();
+      }
+      if (event.target.dataset.action === 'requestMonth') {
+        state.requestMonth = event.target.value || formatMonth(new Date());
+        state.requestSelectedDates = [];
         render();
       }
     });
