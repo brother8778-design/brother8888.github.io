@@ -86,7 +86,7 @@
     .employee-form { display: grid; grid-template-columns: 1fr 190px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
     .employee-form input, .employee-form select, .request-form input, .request-form select, .request-form textarea, .toolbar select { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 11px; font-weight: 850; outline: none; }
     .employee-table th, .employee-table td { padding: 10px 12px; text-align: left; height: auto; }
-    .request-form { display: grid; grid-template-columns: 1fr 160px 160px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
+    .request-form { display: grid; grid-template-columns: 1fr 150px 150px 150px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
     .request-form textarea { grid-column: 1 / -2; min-height: 74px; resize: vertical; }
     .request-card { display: grid; grid-template-columns: 1fr auto; gap: 8px; border-bottom: 1px solid #eef2f7; padding: 14px; background: white; }
     .request-main { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -263,6 +263,11 @@
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
     }
+    function dateRangeLabel(item) {
+      const start = item.startDate || item.date;
+      const end = item.endDate || item.date;
+      return start === end ? start : `${start} ~ ${end}`;
+    }
     function layout(content) {
       document.getElementById('app').innerHTML = `
         <div class="app"><div class="shell">
@@ -392,13 +397,13 @@
         </section>`);
     }
     function renderRequests() {
-      const sorted = [...state.requests].sort((a, b) => `${a.date}-${a.createdAt}`.localeCompare(`${b.date}-${b.createdAt}`));
+      const sorted = [...state.requests].sort((a, b) => `${a.startDate || a.date}-${a.createdAt}`.localeCompare(`${b.startDate || b.date}-${b.createdAt}`));
       const rows = sorted.map(item => `
         <div class="request-card">
           <div>
             <div class="request-main">
               <strong>${escapeHtml(item.name)}</strong>
-              <span class="request-pill">${escapeHtml(item.date)}</span>
+              <span class="request-pill">${escapeHtml(dateRangeLabel(item))}</span>
               <span class="request-pill">${escapeHtml(shifts[item.shift]?.name || item.shift)}</span>
               <span class="request-pill">${escapeHtml(item.createdAt || '')}</span>
             </div>
@@ -412,12 +417,13 @@
           ${state.view === 'employee' ? `
             <div class="request-form">
               <input id="requestName" placeholder="你的姓名" />
-              <input id="requestDate" type="date" value="${formatDate(new Date())}" />
+              <input id="requestStartDate" type="date" value="${formatDate(new Date())}" title="開始日期" />
+              <input id="requestEndDate" type="date" value="${formatDate(new Date())}" title="結束日期" />
               <select id="requestShift">
                 ${Object.values(shifts).filter(s => s.work).map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
               </select>
               <button class="primary" data-action="addRequest">送出</button>
-              <textarea id="requestNote" placeholder="備註，例如：這天只能晚上、希望連排、不要太早等"></textarea>
+              <textarea id="requestNote" placeholder="備註，例如：這幾天只能晚上、希望連排、不要太早等"></textarea>
             </div>
           ` : '<div class="notice" style="margin:12px">這裡會列出員工填寫的希望班，方便主管排班參考。</div>'}
           <div class="table-wrap">
@@ -513,11 +519,14 @@
       }
       if (action === 'addRequest') {
         const name = document.getElementById('requestName').value.trim();
-        const date = document.getElementById('requestDate').value;
+        const startDate = document.getElementById('requestStartDate').value;
+        const endDate = document.getElementById('requestEndDate').value;
         const shift = document.getElementById('requestShift').value;
         const note = document.getElementById('requestNote').value.trim();
-        if (!name || !date) return;
-        state.requests.push({ id: 'req_' + Date.now(), name, date, shift, note, createdAt: formatDate(new Date()) });
+        if (!name || !startDate || !endDate) return;
+        const normalizedStart = startDate <= endDate ? startDate : endDate;
+        const normalizedEnd = startDate <= endDate ? endDate : startDate;
+        state.requests.push({ id: 'req_' + Date.now(), name, date: normalizedStart, startDate: normalizedStart, endDate: normalizedEnd, shift, note, createdAt: formatDate(new Date()) });
         save();
         render();
       }
