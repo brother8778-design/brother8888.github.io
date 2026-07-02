@@ -84,8 +84,14 @@
     .picker-title { padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 10px; text-align: center; color: #64748b; font-size: 12px; font-weight: 950; }
     .picker-grid { display: grid; grid-template-columns: repeat(3, 92px); gap: 8px; }
     .employee-form { display: grid; grid-template-columns: 1fr 190px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
-    .employee-form input, .employee-form select, .toolbar select { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 11px; font-weight: 850; outline: none; }
+    .employee-form input, .employee-form select, .request-form input, .request-form select, .request-form textarea, .toolbar select { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 11px; font-weight: 850; outline: none; }
     .employee-table th, .employee-table td { padding: 10px 12px; text-align: left; height: auto; }
+    .request-form { display: grid; grid-template-columns: 1fr 160px 160px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
+    .request-form textarea { grid-column: 1 / -2; min-height: 74px; resize: vertical; }
+    .request-card { display: grid; grid-template-columns: 1fr auto; gap: 8px; border-bottom: 1px solid #eef2f7; padding: 14px; background: white; }
+    .request-main { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .request-pill { border: 1px solid var(--line); border-radius: 999px; background: #f8fafc; padding: 5px 9px; color: #475569; font-size: 12px; font-weight: 900; }
+    .request-note { grid-column: 1 / -1; color: #475569; font-size: 13px; line-height: 1.6; }
     .timeline { min-width: 900px; padding: 14px; }
     .timeline-grid { display: grid; grid-template-columns: 120px repeat(17, 48px); border-bottom: 1px solid var(--line); }
     .timeline-grid > div { padding: 8px 4px; font-size: 12px; font-weight: 850; border-right: 1px solid #eef2f7; }
@@ -97,7 +103,8 @@
     @media (max-width: 760px) {
       header, nav, .panel-head { align-items: stretch; flex-direction: column; }
       .alerts { grid-template-columns: 1fr; }
-      .employee-form { grid-template-columns: 1fr; }
+      .employee-form, .request-form { grid-template-columns: 1fr; }
+      .request-form textarea { grid-column: auto; }
     }
     @media print {
       @page { size: landscape; margin: 10mm; }
@@ -165,6 +172,7 @@
       quick: null,
       employees: structuredClone(defaults),
       schedule: {},
+      requests: [],
       undo: [],
       filter: 'all',
       selected: null
@@ -175,10 +183,11 @@
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
         if (Array.isArray(saved.employees)) state.employees = saved.employees;
         if (saved.schedule) state.schedule = saved.schedule;
+        if (Array.isArray(saved.requests)) state.requests = saved.requests;
       } catch { localStorage.removeItem(STORAGE_KEY); }
     }
     function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ employees: state.employees, schedule: state.schedule }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ employees: state.employees, schedule: state.schedule, requests: state.requests }));
     }
     function formatDate(date) {
       const y = date.getFullYear();
@@ -268,10 +277,11 @@
             <div class="tabs">
               <button class="tab ${state.tab === 'weekly' ? 'active' : ''}" data-tab="weekly">四週班表</button>
               <button class="tab ${state.tab === 'daily' ? 'active' : ''}" data-tab="daily">每日時間軸</button>
+              <button class="tab ${state.tab === 'requests' ? 'active' : ''}" data-tab="requests">${state.view === 'admin' ? '希望班' : '填希望班'}</button>
               ${state.view === 'admin' ? `<button class="tab ${state.tab === 'employees' ? 'active' : ''}" data-tab="employees">員工</button>` : ''}
             </div>
           </nav>
-          ${state.view === 'employee' ? '<div class="notice">目前是員工檢視模式，只能查看班表，不能修改。</div>' : ''}
+          ${state.view === 'employee' ? '<div class="notice">目前是員工檢視模式，可以查看班表，也可以填寫希望班給主管參考。</div>' : ''}
           <main>${content}</main>
         </div></div>`;
     }
@@ -286,7 +296,7 @@
               <div class="error" id="loginError"></div>
               <button class="primary" style="width:100%; padding:13px">登入</button>
             </form>
-            <div class="hint"><div>管理者：A12345</div><div>員工檢視：B12345</div></div>
+            <div class="hint"><div>員工檢視：B12345</div></div>
           </section>
         </div>`;
       document.getElementById('loginForm').addEventListener('submit', event => {
@@ -381,6 +391,40 @@
           <div class="table-wrap"><table class="employee-table"><thead><tr><th>員工</th><th>職務</th><th style="text-align:right">操作</th></tr></thead><tbody>${rows}</tbody></table></div>
         </section>`);
     }
+    function renderRequests() {
+      const sorted = [...state.requests].sort((a, b) => `${a.date}-${a.createdAt}`.localeCompare(`${b.date}-${b.createdAt}`));
+      const rows = sorted.map(item => `
+        <div class="request-card">
+          <div>
+            <div class="request-main">
+              <strong>${escapeHtml(item.name)}</strong>
+              <span class="request-pill">${escapeHtml(item.date)}</span>
+              <span class="request-pill">${escapeHtml(shifts[item.shift]?.name || item.shift)}</span>
+              <span class="request-pill">${escapeHtml(item.createdAt || '')}</span>
+            </div>
+            ${item.note ? `<div class="request-note">${escapeHtml(item.note)}</div>` : ''}
+          </div>
+          ${state.view === 'admin' ? `<button class="danger" data-request-delete="${item.id}">刪除</button>` : ''}
+        </div>
+      `).join('');
+      layout(`
+        <section class="panel">
+          ${state.view === 'employee' ? `
+            <div class="request-form">
+              <input id="requestName" placeholder="你的姓名" />
+              <input id="requestDate" type="date" value="${formatDate(new Date())}" />
+              <select id="requestShift">
+                ${Object.values(shifts).filter(s => s.work).map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+              </select>
+              <button class="primary" data-action="addRequest">送出</button>
+              <textarea id="requestNote" placeholder="備註，例如：這天只能晚上、希望連排、不要太早等"></textarea>
+            </div>
+          ` : '<div class="notice" style="margin:12px">這裡會列出員工填寫的希望班，方便主管排班參考。</div>'}
+          <div class="table-wrap">
+            ${rows || '<div class="empty">目前還沒有希望班資料</div>'}
+          </div>
+        </section>`);
+    }
     function exportCsv() {
       const days = days28();
       const header = ['員工', '職務', ...days.map(d => `${d.key}(${d.dow})`), '簽名'];
@@ -400,10 +444,11 @@
       if (state.view === 'login') return renderLogin();
       if (state.tab === 'daily') renderDaily();
       else if (state.tab === 'employees') renderEmployees();
+      else if (state.tab === 'requests') renderRequests();
       else renderWeekly();
     }
     document.addEventListener('click', event => {
-      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-pick],[data-delete]');
+      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-pick],[data-delete],[data-request-delete]');
       if (!target) {
         if (state.selected) { state.selected = null; render(); }
         return;
@@ -428,6 +473,12 @@
         const next = structuredClone(state.schedule);
         Object.keys(next).forEach(date => { delete next[date][id]; if (!Object.keys(next[date]).length) delete next[date]; });
         state.schedule = next;
+        save();
+        render();
+        return;
+      }
+      if (target.dataset.requestDelete) {
+        state.requests = state.requests.filter(item => item.id !== target.dataset.requestDelete);
         save();
         render();
         return;
@@ -457,6 +508,16 @@
         const role = document.getElementById('newRole').value;
         if (!name) return;
         state.employees.push({ id: 'emp_' + Date.now(), name, role, type: role === 'parttime' ? 'parttime' : 'fulltime' });
+        save();
+        render();
+      }
+      if (action === 'addRequest') {
+        const name = document.getElementById('requestName').value.trim();
+        const date = document.getElementById('requestDate').value;
+        const shift = document.getElementById('requestShift').value;
+        const note = document.getElementById('requestNote').value.trim();
+        if (!name || !date) return;
+        state.requests.push({ id: 'req_' + Date.now(), name, date, shift, note, createdAt: formatDate(new Date()) });
         save();
         render();
       }
