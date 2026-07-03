@@ -599,8 +599,9 @@
             </div>
             <div class="toolbar">
               <select data-action="filter">${filterOptions}</select>
-              ${state.view === 'admin' ? '<button class="secondary" data-action="copyWeek">複製上週</button><button class="secondary" data-action="fillOff">空格設休</button><button class="secondary" data-action="undo">復原</button>' : ''}
+              ${state.view === 'admin' ? '<button class="secondary" data-action="copyWeek">複製上週</button><button class="secondary" data-action="fillOff">空格設休</button><button class="secondary" data-action="undo">復原</button><button class="secondary" data-action="exportData">匯出資料</button><button class="secondary" data-action="importData">匯入資料</button>' : ''}
               <button class="primary" data-action="print">列印</button>
+              <input id="importDataFile" type="file" accept="application/json,.json" style="display:none" data-action="importDataFile" />
             </div>
           </div>
           <div class="people-filter"><span>只看</span>${personChips}</div>
@@ -746,6 +747,42 @@
         URL.revokeObjectURL(url);
         a.remove();
       }, 1000);
+    }
+    function exportData() {
+      const payload = {
+        app: 'fitness-schedule-html',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        employees: state.employees,
+        schedule: state.schedule,
+        requests: state.requests
+      };
+      downloadFile(`fitness-schedule-data-${formatDate(new Date())}.json`, JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
+      showToast('資料已匯出，可以到線上版匯入');
+    }
+    function importDataFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const payload = JSON.parse(String(reader.result || '{}'));
+          if (!Array.isArray(payload.employees) || typeof payload.schedule !== 'object' || payload.schedule === null) {
+            showToast('匯入失敗：檔案格式不正確');
+            return;
+          }
+          state.employees = payload.employees;
+          state.schedule = payload.schedule || {};
+          state.requests = Array.isArray(payload.requests) ? payload.requests : [];
+          state.undo = [];
+          normalizeEmployeeOrder();
+          save();
+          showToast('資料已匯入');
+          render();
+        } catch {
+          showToast('匯入失敗：檔案無法讀取');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
     }
     function exportHtml() {
       const days = days28();
@@ -900,6 +937,8 @@
       if (action === 'nextDay') { state.timelineDate.setDate(state.timelineDate.getDate() + 1); render(); }
       if (action === 'print') { printSchedule(); return; }
       if (action === 'html') { exportHtml(); return; }
+      if (action === 'exportData') { exportData(); return; }
+      if (action === 'importData') { document.getElementById('importDataFile')?.click(); return; }
       if (action === 'toggleAlerts') { state.alertsOpen = !state.alertsOpen; render(); return; }
       if (action === 'undo' && state.undo.length) { state.schedule = state.undo.shift(); save(); render(); }
       if (action === 'copyWeek') {
@@ -1007,6 +1046,10 @@
         state.requestMonth = event.target.value || formatMonth(new Date());
         state.requestSelectedDates = [];
         render();
+      }
+      if (event.target.dataset.action === 'importDataFile') {
+        importDataFile(event.target.files?.[0]);
+        event.target.value = '';
       }
     });
     window.addEventListener('resize', () => {
