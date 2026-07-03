@@ -170,6 +170,10 @@
       { id: 'p3', name: '工讀生 丙', role: 'parttime', type: 'parttime' },
       { id: 'p4', name: '工讀生 丁', role: 'parttime', type: 'parttime' }
     ];
+    const cloneData = (value) => {
+      if (typeof structuredClone === 'function') return structuredClone(value);
+      return JSON.parse(JSON.stringify(value));
+    };
     const state = {
       view: 'login',
       tab: 'weekly',
@@ -178,7 +182,7 @@
       quick: null,
       requestMonth: formatMonth(new Date()),
       requestSelectedDates: [],
-      employees: structuredClone(defaults),
+      employees: cloneData(defaults),
       schedule: {},
       requests: [],
       undo: [],
@@ -272,13 +276,13 @@
       return messages.slice(0, 8);
     }
     function pushSchedule(next) {
-      state.undo.unshift(structuredClone(state.schedule));
+      state.undo.unshift(cloneData(state.schedule));
       state.undo = state.undo.slice(0, 20);
       state.schedule = next;
       save();
     }
     function setShift(date, empId, shiftId) {
-      const next = structuredClone(state.schedule);
+      const next = cloneData(state.schedule);
       next[date] ||= {};
       if (shiftId) next[date][empId] = shiftId;
       else delete next[date][empId];
@@ -294,6 +298,16 @@
       const start = item.startDate || item.date;
       const end = item.endDate || item.date;
       return start === end ? start : `${start} ~ ${end}`;
+    }
+    function selectedDatesText() {
+      return `已選 ${state.requestSelectedDates.length} 天：${state.requestSelectedDates.length ? [...state.requestSelectedDates].sort().join('、') : '請點選可上班日期'}`;
+    }
+    function updateRequestSelectionDisplay() {
+      document.querySelectorAll('[data-request-date]').forEach(button => {
+        button.classList.toggle('selected', state.requestSelectedDates.includes(button.dataset.requestDate));
+      });
+      const summary = document.getElementById('requestSelectedSummary');
+      if (summary) summary.textContent = selectedDatesText();
     }
     function layout(content) {
       document.getElementById('app').innerHTML = `
@@ -462,7 +476,8 @@
               </select>
               <button class="primary" data-action="addRequest">送出</button>
               <div class="request-calendar">${calendarCells}</div>
-              <div class="request-selected">已選 ${state.requestSelectedDates.length} 天：${state.requestSelectedDates.length ? [...state.requestSelectedDates].sort().join('、') : '請點選可上班日期'}</div>
+              <div class="request-selected" id="requestSelectedSummary">${selectedDatesText()}</div>
+              <button class="secondary" data-action="clearRequestDates" style="grid-column:1 / -1">清除已選日期</button>
               <textarea id="requestNote" placeholder="備註，例如：這幾天只能晚上、希望連排、不要太早等"></textarea>
             </div>
           ` : '<div class="notice" style="margin:12px">這裡會列出員工填寫的希望班，方便主管排班參考。</div>'}
@@ -505,7 +520,7 @@
         state.requestSelectedDates = state.requestSelectedDates.includes(date)
           ? state.requestSelectedDates.filter(item => item !== date)
           : [...state.requestSelectedDates, date].sort();
-        render();
+        updateRequestSelectionDisplay();
         return;
       }
       if (target.dataset.quick) { state.quick = state.quick === target.dataset.quick ? null : target.dataset.quick; render(); return; }
@@ -524,7 +539,7 @@
       if (target.dataset.delete) {
         const id = target.dataset.delete;
         state.employees = state.employees.filter(emp => emp.id !== id);
-        const next = structuredClone(state.schedule);
+        const next = cloneData(state.schedule);
         Object.keys(next).forEach(date => { delete next[date][id]; if (!Object.keys(next[date]).length) delete next[date]; });
         state.schedule = next;
         save();
@@ -548,11 +563,11 @@
       if (action === 'undo' && state.undo.length) { state.schedule = state.undo.shift(); save(); render(); }
       if (action === 'copyWeek') {
         const days = days28();
-        const next = structuredClone(state.schedule);
+        const next = cloneData(state.schedule);
         days.slice(0, 7).forEach(day => {
           const source = new Date(day.date);
           source.setDate(source.getDate() - 7);
-          next[day.key] = structuredClone(state.schedule[formatDate(source)] || {});
+          next[day.key] = cloneData(state.schedule[formatDate(source)] || {});
         });
         pushSchedule(next);
         render();
@@ -564,6 +579,10 @@
         state.employees.push({ id: 'emp_' + Date.now(), name, role, type: role === 'parttime' ? 'parttime' : 'fulltime' });
         save();
         render();
+      }
+      if (action === 'clearRequestDates') {
+        state.requestSelectedDates = [];
+        updateRequestSelectionDisplay();
       }
       if (action === 'addRequest') {
         const name = document.getElementById('requestName').value.trim();
