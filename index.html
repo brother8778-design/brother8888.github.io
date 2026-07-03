@@ -192,6 +192,11 @@
 
     function load() {
       try {
+        if (new URLSearchParams(location.search).has('reset')) {
+          localStorage.removeItem(STORAGE_KEY);
+          history.replaceState(null, '', location.pathname);
+          return;
+        }
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
         if (Array.isArray(saved.employees)) state.employees = saved.employees;
         if (saved.schedule) state.schedule = saved.schedule;
