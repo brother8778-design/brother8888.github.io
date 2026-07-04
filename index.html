@@ -49,6 +49,8 @@
     .panel { height: 100%; overflow: hidden; display: flex; flex-direction: column; }
     .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #eef2f7; background: #f8fafc; }
     .range-title { min-width: 230px; text-align: center; font-size: 14px; font-weight: 950; }
+    .mobile-controls-toggle { display: none; width: calc(100% - 20px); margin: 10px; justify-content: space-between; align-items: center; }
+    .weekly-controls { display: contents; }
     .quickbar { border-bottom: 1px solid #c7d2fe; background: #eef2ff; padding: 8px 12px; overflow-x: auto; }
     .quickbar span { color: #3730a3; font-size: 12px; font-weight: 950; white-space: nowrap; }
     .chip { border: 1px solid var(--line); border-radius: 10px; background: white; color: #475569; padding: 7px 10px; font-size: 12px; font-weight: 900; white-space: nowrap; }
@@ -89,8 +91,8 @@
     .N { background: #e0e7ff; color: #3730a3; border-color: #a5b4fc; }
     .P { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
     .O { background: #e2e8f0; color: #dc2626; border-color: #cbd5e1; border-style: dashed; }
-    .AL { background: #fae8ff; color: #a21caf; border-color: #f0abfc; border-style: dashed; }
-    .CUSTOM { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+    .AL { background: #fee2e2; color: #dc2626; border-color: #fca5a5; border-style: dashed; }
+    .CUSTOM { background: transparent; color: #2563eb; border-color: transparent; }
     .picker { position: fixed; inset: 0; display: none; place-items: center; background: rgba(15,23,42,.16); z-index: 10; padding: 20px; }
     .picker.open { display: grid; }
     .picker-card { width: min(360px, 100%); background: white; border: 1px solid var(--line); border-radius: 16px; padding: 14px; box-shadow: 0 20px 40px rgba(15,23,42,.18); }
@@ -141,6 +143,8 @@
       .tabs { width: 100%; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; }
       .tab { min-width: 0; padding: 8px 4px; font-size: 11px; white-space: nowrap; }
       .panel { border-radius: 14px; }
+      .mobile-controls-toggle { display: flex; }
+      .weekly-controls.collapsed { display: none; }
       .panel-head { gap: 8px; padding: 10px; }
       .toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
       .toolbar:first-child { grid-template-columns: 1fr 1fr; }
@@ -276,6 +280,7 @@
       timelineDate: new Date(),
       quick: null,
       alertsOpen: false,
+      controlsOpen: false,
       requestMonth: formatMonth(new Date()),
       requestSelectedDates: [],
       employees: cloneData(defaults),
@@ -573,6 +578,7 @@
       const alerts = getAlerts(days, sum);
       const alertPreview = alerts[0] || '';
       const employees = sortEmployees(state.employees.filter(employeeVisible));
+      const controlsCollapsed = mobile && !state.controlsOpen;
       const filterOptions = `<option value="all">全部員工</option>${roles.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}`;
       const selectedPeople = Array.isArray(state.personFilter) ? state.personFilter : [];
       const personChips = `<button class="person-chip ${selectedPeople.length ? '' : 'active'}" data-person-filter="all">全部人員</button>${sortEmployees(state.employees.filter(emp => roleMatches(emp, state.filter))).map(emp => `<button class="person-chip ${selectedPeople.includes(emp.id) ? 'active' : ''}" data-person-filter="${emp.id}">${escapeHtml(emp.name)}</button>`).join('')}`;
@@ -590,6 +596,11 @@
       }).join('');
       layout(`
         <section class="panel">
+          <button class="secondary mobile-controls-toggle" data-action="toggleControls">
+            <span>${days[0].key} 到 ${days[days.length - 1].key}</span>
+            <span>${controlsCollapsed ? '展開工具 ▼' : '收合工具 ▲'}</span>
+          </button>
+          <div class="weekly-controls ${controlsCollapsed ? 'collapsed' : ''}">
           <div class="panel-head">
             <div class="toolbar">
               <button class="secondary" data-action="prev4">${mobile ? '前一週' : '前四週'}</button>
@@ -613,6 +624,7 @@
             </button>
             ${state.alertsOpen ? `<div class="alerts">${alerts.map(a => `<div>提醒：${escapeHtml(a)}</div>`).join('')}</div>` : ''}
           </div>` : ''}
+          </div>
           <div class="table-wrap"><table><thead><tr><th class="name-col">員工</th>${head}<th class="signature-col">簽名</th></tr></thead><tbody>${rows}</tbody></table></div>
         </section>
         <div class="picker ${state.selected ? 'open' : ''}" id="picker"><div class="picker-card">
@@ -826,8 +838,8 @@
     .N { background: #e0e7ff; color: #3730a3; border-color: #a5b4fc; }
     .P { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
     .O { background: #e2e8f0; color: #dc2626; border-color: #cbd5e1; }
-    .AL { background: #fae8ff; color: #a21caf; border-color: #f0abfc; }
-    .CUSTOM { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+    .AL { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+    .CUSTOM { background: transparent; color: #2563eb; border-color: transparent; }
   </style>
 </head>
 <body>
@@ -939,6 +951,7 @@
       if (action === 'html') { exportHtml(); return; }
       if (action === 'exportData') { exportData(); return; }
       if (action === 'importData') { document.getElementById('importDataFile')?.click(); return; }
+      if (action === 'toggleControls') { state.controlsOpen = !state.controlsOpen; render(); return; }
       if (action === 'toggleAlerts') { state.alertsOpen = !state.alertsOpen; render(); return; }
       if (action === 'undo' && state.undo.length) { state.schedule = state.undo.shift(); save(); render(); }
       if (action === 'copyWeek') {
