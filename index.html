@@ -221,6 +221,36 @@
 <body>
   <div id="app"></div>
 
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyBwypaoiORkxJZqjbg-3XkHwmCHM7vTIZM',
+      authDomain: 'igym-1fca5.firebaseapp.com',
+      projectId: 'igym-1fca5',
+      storageBucket: 'igym-1fca5.firebasestorage.app',
+      messagingSenderId: '225172176853',
+      appId: '1:225172176853:web:aa924ce203f7a948a1875c',
+      measurementId: 'G-NVH2886M20'
+    };
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const firestoreDb = getFirestore(firebaseApp);
+
+    window.firebaseApp = firebaseApp;
+    window.firestoreDb = firestoreDb;
+    window.writeLogToFirestore = async function writeLogToFirestore(data) {
+      return addDoc(collection(firestoreDb, 'logs'), {
+        ...data,
+        createdAt: serverTimestamp(),
+        pageUrl: location.href,
+        userAgent: navigator.userAgent
+      });
+    };
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
+
   <script>
     const STORAGE_KEY = 'fitness-schedule-html-v1';
     const GOOGLE_FORM_EDIT_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc6iTssu0wfFJa4HvYDPndIJ1AgtJkKRzZUVecJFC6z4eDOyg/viewform?usp=dialog';
@@ -753,7 +783,7 @@
               <input type="month" value="${state.requestMonth}" data-action="requestMonth" />
               <button class="secondary" data-action="currentRequestMonth">回本月</button>
               <select id="requestShift">${shiftOptions}</select>
-              <button class="primary" data-action="addRequest">送到表單</button>
+              <button class="primary" data-action="addRequest">送出</button>
               <div class="request-calendar">${calendarCells}</div>
               <div class="request-selected" id="requestSelectedSummary">${selectedDatesText()}</div>
               <textarea id="requestNote" placeholder="備註，例如：只方便早班、可配合調整"></textarea>
@@ -1109,8 +1139,19 @@
         const note = document.getElementById('requestNote').value.trim();
         const dates = [...state.requestSelectedDates].sort();
         if (!name || !dates.length) return;
-        state.requests.push({ id: 'req_' + Date.now(), name, date: dates[0], dates, shift, note, createdAt: formatDate(new Date()) });
+        const requestLog = { id: 'req_' + Date.now(), name, date: dates[0], dates, shift, shiftName: shiftInfo(shift)?.name || shift, note, createdAt: formatDate(new Date()) };
+        state.requests.push(requestLog);
         submitGoogleForm(buildGoogleFormDetails(name, dates, shift, note));
+        if (window.writeLogToFirestore) {
+          window.writeLogToFirestore({ type: 'shift_request', ...requestLog })
+            .then(() => showToast('已送出並寫入 Firebase'))
+            .catch(error => {
+              console.error('Firebase write failed:', error);
+              showToast('已本機記錄，Firebase 寫入失敗，請檢查 Firestore 權限');
+            });
+        } else {
+          showToast('已本機記錄，Firebase 尚未完成載入');
+        }
         state.requestSelectedDates = [];
         save();
         state.tab = 'weekly';
