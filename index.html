@@ -205,12 +205,26 @@
       .alerts { max-height: 84px; }
     }
     @media print {
-      @page { size: landscape; margin: 10mm; }
+      @page { size: A4 landscape; margin: 5mm; }
+      html, body { width: 287mm; height: 200mm; overflow: hidden; }
       body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .app { padding: 0; }
+      .app { padding: 0; min-height: auto; }
       header, nav, .quickbar, .toolbar, .notice, .alerts, .picker { display: none !important; }
-      .shell, .panel { height: auto; box-shadow: none; border: 0; }
-      .table-wrap { overflow: visible; }
+      .shell, .panel { height: auto; min-height: 0; gap: 0; box-shadow: none; border: 0; }
+      .panel { padding: 0; overflow: visible; }
+      .table-wrap { overflow: visible; max-height: none; border: 0; }
+      table { width: 100%; min-width: 0 !important; table-layout: fixed; border: 1px solid #64748b; }
+      th, td { border: 1px solid #64748b; padding: 1mm .5mm; }
+      .name-col { width: 23mm !important; min-width: 23mm !important; position: static; padding: 1mm; }
+      .date-col { width: auto !important; min-width: 0 !important; }
+      .signature-col { width: 22mm !important; min-width: 22mm !important; }
+      tbody td { height: 8mm !important; padding: .5mm; }
+      .employee-name { white-space: normal; line-height: 1.05; font-size: 7pt; }
+      .role, .date { font-size: 5.5pt; line-height: 1; }
+      .dow { font-size: 6.5pt; line-height: 1; }
+      .holiday { margin-top: .5mm; padding: 0 .5mm; font-size: 4.5pt; line-height: 1.15; }
+      .shift { font-size: 7pt; border-radius: 0; padding: 0; }
+      .signature-line { height: 5mm; }
     }
     .shift.M, .shift.A, .shift.N, .shift.P, .shift.CUSTOM,
     .picker-grid .shift.M, .picker-grid .shift.A, .picker-grid .shift.N, .picker-grid .shift.P, .picker-grid .shift.CUSTOM {
@@ -963,22 +977,23 @@
   <meta charset="utf-8">
   <title>FITNESS SCHEDULE ${days[0].key}</title>
   <style>
-    @page { size: landscape; margin: 10mm; }
-    body { margin: 0; color: #0f172a; font-family: "Microsoft JhengHei", system-ui, sans-serif; }
-    h1 { margin: 0 0 4px; font-size: 22px; }
-    .range { margin-bottom: 12px; color: #475569; font-weight: 700; }
+    @page { size: A4 landscape; margin: 5mm; }
+    html, body { width: 287mm; height: 200mm; overflow: hidden; }
+    body { margin: 0; color: #0f172a; font-family: "Microsoft JhengHei", system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    h1 { margin: 0 0 1mm; font-size: 13pt; line-height: 1; }
+    .range { margin-bottom: 2mm; color: #475569; font-weight: 700; font-size: 8pt; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #64748b; }
-    th, td { border: 1px solid #64748b; padding: 5px 3px; text-align: center; font-size: 11px; }
+    th, td { border: 1px solid #64748b; padding: 1mm .5mm; text-align: center; font-size: 7pt; line-height: 1.05; }
     th { background: #f8fafc; }
-    .name { width: 120px; text-align: left; background: #fff; }
-    .signature { width: 90px; border-bottom: 1px dashed #64748b; }
+    .name { width: 23mm; text-align: left; background: #fff; }
+    .signature { width: 22mm; border-bottom: 1px dashed #64748b; }
     .monday { background: #f3e8ff; }
     .weekend { background: #fef3c7; }
     .holiday-cell { background: #fee2e2; }
-    .meeting, .holiday { display: block; margin-top: 2px; border-radius: 4px; color: white; padding: 1px 2px; font-size: 8px; }
+    .meeting, .holiday { display: block; margin-top: .5mm; border-radius: 2px; color: white; padding: 0 .5mm; font-size: 4.5pt; }
     .meeting { background: #a855f7; }
     .holiday { background: #ef4444; }
-    .shift { display: inline-block; min-width: 24px; border-radius: 6px; border: 0; padding: 3px 4px; font-weight: 900; background: transparent !important; box-shadow: none !important; }
+    .shift { display: inline-block; min-width: 5mm; border-radius: 0; border: 0; padding: 0; font-weight: 900; background: transparent !important; box-shadow: none !important; }
     .M, .A, .N, .P, .CUSTOM { color: #111827; }
     .O, .AL { color: #dc2626; }
   </style>
@@ -999,7 +1014,8 @@
     function printSchedule() {
       showToast('列印視窗開啟後，請選擇列印或另存 PDF');
       setTimeout(() => window.print(), 80);
-    }    function render() {
+    }
+    function render() {
       if (state.view === 'login') return renderLogin();
       if (state.tab === 'daily') renderDaily();
       else if (state.tab === 'employees') renderEmployees();
