@@ -79,6 +79,8 @@
     .role { color: #94a3b8; font-size: 10px; font-weight: 850; }
     .date { color: #64748b; font-size: 10px; font-weight: 950; }
     .dow { font-size: 12px; font-weight: 950; }
+    .copy-date { cursor: pointer; }
+    .copy-source { outline: 2px solid #4f46e5; outline-offset: -2px; }
     .holiday { margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 4px; background: #ef4444; color: white; padding: 1px 2px; font-size: 8px; font-weight: 900; }
     .monday { background: #f3e8ff !important; }
     .weekend { background: #fef3c7 !important; }
@@ -291,6 +293,7 @@
       quick: null,
       alertsOpen: false,
       controlsOpen: false,
+      copyDaySource: null,
       requestMonth: formatMonth(new Date()),
       requestSelectedDates: [],
       employees: cloneData(defaults),
@@ -432,6 +435,13 @@
       if (!s) return '';
       return s.work ? String(s.start) : s.short;
     }
+    function shiftInlineStyle(shiftId) {
+      const red = ['O', 'AL'].includes(String(shiftId));
+      return `background:transparent!important;color:${red ? '#dc2626' : '#111827'}!important;border-color:transparent!important;box-shadow:none!important;`;
+    }
+    function shiftCellHtml(shiftId, tag = 'div') {
+      return `<${tag} class="shift ${shiftClass(shiftId)}" style="${shiftInlineStyle(shiftId)}">${escapeHtml(shiftCellLabel(shiftId))}</${tag}>`;
+    }
     function employeeNameHtml(name) {
       const parts = String(name).trim().split(/\s+/);
       if (parts.length < 2) return escapeHtml(name);
@@ -455,6 +465,9 @@
       days.forEach(day => {
         const assigned = state.schedule[day.key] || {};
         const working = state.employees.filter(emp => assigned[emp.id] && shiftInfo(assigned[emp.id])?.work);
+        [7, 12, 16].forEach(hour => {
+          if (!working.some(emp => shiftInfo(assigned[emp.id])?.start === hour)) messages.push(`${day.key} 沒有 ${hour} 點人員上班`);
+        });
         if (!working.some(emp => roleMatches(emp, 'coach'))) messages.push(`${day.key} 沒有教練上班`);
         if (!working.some(emp => emp.role === 'frontdesk')) messages.push(`${day.key} 沒有櫃台人員上班`);
         if ((day.weekend || day.holiday) && working.length < 3) messages.push(`${day.key} 假日人力少於 3 人`);
@@ -596,13 +609,15 @@
         const cells = days.map(day => {
           const id = state.schedule[day.key]?.[emp.id];
           const dayClass = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
-          return `<td class="cell ${dayClass}" data-date="${day.key}" data-emp="${emp.id}">${id ? `<div class="shift ${shiftClass(id)}">${shiftCellLabel(id)}</div>` : ''}</td>`;
+          return `<td class="cell ${dayClass}" data-date="${day.key}" data-emp="${emp.id}">${id ? shiftCellHtml(id) : ''}</td>`;
         }).join('');
         return `<tr><td class="name-col"><div class="employee-name">${employeeNameHtml(emp.name)}</div><div class="role">${roleLabel(emp.role)}</div></td>${cells}<td class="signature-col"><div class="signature-line"></div></td></tr>`;
       }).join('');
       const head = days.map(day => {
         const dayClass = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
-        return `<th class="date-col ${dayClass}"><div class="date">${day.key.slice(5).replace('-', '/')}</div><div class="dow">${day.dow}</div>${day.monday && !day.holiday ? '<div class="holiday" style="background:#a855f7">開會</div>' : ''}${day.holiday ? `<div class="holiday" title="${day.holiday}">${day.holiday}</div>` : ''}</th>`;
+        const copyClass = state.copyDaySource === day.key ? 'copy-source' : '';
+        const copyTitle = state.view === 'admin' ? (state.copyDaySource ? `貼上到 ${day.key}` : `複製 ${day.key} 整天班表`) : '';
+        return `<th class="date-col ${dayClass} ${copyClass} ${state.view === 'admin' ? 'copy-date' : ''}" ${state.view === 'admin' ? `data-copy-date="${day.key}" title="${copyTitle}"` : ''}><div class="date">${day.key.slice(5).replace('-', '/')}</div><div class="dow">${day.dow}</div>${day.monday && !day.holiday ? '<div class="holiday" style="background:#a855f7">開會</div>' : ''}${day.holiday ? `<div class="holiday" title="${day.holiday}">${day.holiday}</div>` : ''}</th>`;
       }).join('');
       layout(`
         <section class="panel">
@@ -620,7 +635,7 @@
             </div>
             <div class="toolbar">
               <select data-action="filter">${filterOptions}</select>
-              ${state.view === 'admin' ? '<button class="secondary" data-action="copyWeek">複製上週</button><button class="secondary" data-action="fillOff">空格設休</button><button class="secondary" data-action="undo">復原</button><button class="secondary" data-action="exportData">匯出資料</button><button class="secondary" data-action="importData">匯入資料</button>' : ''}
+              ${state.view === 'admin' ? `<button class="secondary" data-action="copyWeek">複製上週</button>${state.copyDaySource ? '<button class="secondary" data-action="cancelCopyDay">取消複製</button>' : ''}<button class="secondary" data-action="fillOff">空格設休</button><button class="secondary" data-action="undo">復原</button><button class="secondary" data-action="exportData">匯出資料</button><button class="secondary" data-action="importData">匯入資料</button>` : ''}
               <button class="primary" data-action="print">列印</button>
               <input id="importDataFile" type="file" accept="application/json,.json" style="display:none" data-action="importDataFile" />
             </div>
@@ -817,7 +832,7 @@
         const cells = days.map(day => {
           const id = state.schedule[day.key]?.[emp.id];
           const cls = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
-          return `<td class="${cls}">${id ? `<span class="shift ${shiftClass(id)}">${escapeHtml(shiftCellLabel(id))}</span>` : ''}</td>`;
+          return `<td class="${cls}">${id ? shiftCellHtml(id, 'span') : ''}</td>`;
         }).join('');
         return `<tr><td class="name"><b>${escapeHtml(emp.name)}</b><br><small>${roleLabel(emp.role)}</small></td>${cells}<td class="signature"></td></tr>`;
       }).join('');
@@ -879,7 +894,7 @@
         render();
         return;
       }
-      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-pick],[data-delete],[data-edit],[data-move],[data-person-filter],[data-request-delete],[data-request-date]');
+      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-copy-date],[data-pick],[data-delete],[data-edit],[data-move],[data-person-filter],[data-request-delete],[data-request-date]');
       if (!target) {
         if (state.selected && event.target.closest('#picker .picker-card')) return;
         if (state.selected) { state.selected = null; render(); }
@@ -904,6 +919,27 @@
         return;
       }
       if (target.dataset.quick) { state.quick = state.quick === target.dataset.quick ? null : target.dataset.quick; render(); return; }
+      if (target.dataset.copyDate && state.view === 'admin') {
+        const date = target.dataset.copyDate;
+        if (!state.copyDaySource) {
+          state.copyDaySource = date;
+          showToast(`已複製 ${date}，再點其他日期貼上`);
+          render();
+          return;
+        }
+        if (state.copyDaySource === date) {
+          showToast('已選這天當來源，請點其他日期貼上');
+          return;
+        }
+        const next = cloneData(state.schedule);
+        const source = cloneData(state.schedule[state.copyDaySource] || {});
+        if (Object.keys(source).length) next[date] = source;
+        else delete next[date];
+        pushSchedule(next);
+        showToast(`已貼上到 ${date}`);
+        render();
+        return;
+      }
       if (target.dataset.date && state.view === 'admin') {
         const date = target.dataset.date, emp = target.dataset.emp;
         if (state.quick === 'CLEAR') setShift(date, emp, null);
@@ -958,6 +994,7 @@
       if (action === 'html') { exportHtml(); return; }
       if (action === 'exportData') { exportData(); return; }
       if (action === 'importData') { document.getElementById('importDataFile')?.click(); return; }
+      if (action === 'cancelCopyDay') { state.copyDaySource = null; render(); return; }
       if (action === 'toggleControls') { state.controlsOpen = !state.controlsOpen; render(); return; }
       if (action === 'toggleAlerts') { state.alertsOpen = !state.alertsOpen; render(); return; }
       if (action === 'undo' && state.undo.length) { state.schedule = state.undo.shift(); save(); render(); }
