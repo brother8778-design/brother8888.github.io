@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <!-- deploy-version: 2026-07-04-force-pages-refresh -->
+  <!-- deploy-version: 2026-07-04-frontdesk-16-refresh -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FITNESS SCHEDULE - 健身房排班系統</title>
+  <title>FITNESS SCHEDULE - ?亥澈?踵??剔頂蝯?/title>
   <style>
     :root {
       --bg: #eef3f8;
@@ -283,58 +283,58 @@
   <script>
     const STORAGE_KEY = 'fitness-schedule-html-v1';
     const recurringHolidays = {
-      '01-01': '元旦',
-      '02-28': '228和平紀念日',
-      '04-04': '兒童節',
-      '04-05': '清明節',
-      '05-01': '勞動節',
-      '10-10': '國慶日'
+      '01-01': '?',
+      '02-28': '228?像蝝敹菜',
+      '04-04': '?咱蝭',
+      '04-05': '皜?蝭',
+      '05-01': '??蝭',
+      '10-10': '???
     };
     const variableHolidays = {
-      '2026-02-16': '春節除夕',
-      '2026-02-17': '春節初一',
-      '2026-02-18': '春節初二',
-      '2026-02-19': '春節初三',
-      '2026-02-20': '春節初四',
-      '2026-02-21': '春節初五',
-      '2026-04-03': '清明/兒童連假',
-      '2026-04-06': '清明補假',
-      '2026-06-19': '端午節',
-      '2026-09-25': '中秋節',
-      '2027-02-05': '春節除夕',
-      '2027-02-06': '春節初一'
+      '2026-02-16': '?亦??文?',
+      '2026-02-17': '?亦???',
+      '2026-02-18': '?亦???',
+      '2026-02-19': '?亦???',
+      '2026-02-20': '?亦???',
+      '2026-02-21': '?亦???',
+      '2026-04-03': '皜?/?咱???',
+      '2026-04-06': '皜?鋆?',
+      '2026-06-19': '蝡臬?蝭',
+      '2026-09-25': '銝剔?蝭',
+      '2027-02-05': '?亦??文?',
+      '2027-02-06': '?亦???'
     };
     const shifts = {
-      M: { id: 'M', name: '早班', short: '早', start: 7, end: 16, work: true },
-      A: { id: 'A', name: '中班', short: '中', start: 12, end: 21, work: true },
-      N: { id: 'N', name: '晚班', short: '晚', start: 14, end: 23, work: true },
-      P: { id: 'P', name: '工讀', short: '工', start: 16, end: 23, work: true },
-      O: { id: 'O', name: '排休', short: '休', start: 7, end: 23, work: false },
-      AL: { id: 'AL', name: '特休', short: '特', start: 7, end: 23, work: false }
+      M: { id: 'M', name: '?拍', short: '??, start: 7, end: 16, work: true },
+      A: { id: 'A', name: '銝剔', short: '銝?, start: 12, end: 21, work: true },
+      N: { id: 'N', name: '?', short: '??, start: 14, end: 23, work: true },
+      P: { id: 'P', name: '撌亥?', short: '撌?, start: 16, end: 23, work: true },
+      O: { id: 'O', name: '??', short: '隡?, start: 7, end: 23, work: false },
+      AL: { id: 'AL', name: '?嫣?', short: '??, start: 7, end: 23, work: false }
     };
     const roles = [
-      { id: 'manager', name: '店長' },
-      { id: 'operations_lead', name: '營運組長' },
-      { id: 'coach_lead', name: '教練主管' },
-      { id: 'coach', name: '教練' },
-      { id: 'frontdesk', name: '櫃台' },
-      { id: 'parttime', name: '工讀' }
+      { id: 'manager', name: '摨' },
+      { id: 'operations_lead', name: '??蝯' },
+      { id: 'coach_lead', name: '?毀銝餌恣' },
+      { id: 'coach', name: '?毀' },
+      { id: 'frontdesk', name: '瑹' },
+      { id: 'parttime', name: '撌亥?' }
     ];
     const defaults = [
-      { id: 'c1', name: '潘威倫 Wally', role: 'coach', type: 'fulltime' },
-      { id: 'c2', name: '洪錦廷 Timmy', role: 'coach', type: 'fulltime' },
-      { id: 'c3', name: '李佳恩 Tifa', role: 'coach', type: 'fulltime' },
-      { id: 'c4', name: '簡文蕙 Nomi', role: 'coach', type: 'fulltime' },
-      { id: 'c5', name: '黃泊瑜 Bryant', role: 'coach', type: 'fulltime' },
-      { id: 'c6', name: '楊治傑 Jerry', role: 'coach', type: 'fulltime' },
-      { id: 'c7', name: '林泓旭 Henry', role: 'coach', type: 'fulltime' },
-      { id: 'f1', name: '王琳 Mandy', role: 'frontdesk', type: 'fulltime' },
-      { id: 'p1', name: '姚銘 BOBO', role: 'parttime', type: 'parttime' },
-      { id: 'p2', name: '鄭亞欣 Ruby', role: 'parttime', type: 'parttime' },
-      { id: 'p3', name: '吳子帆 LBO', role: 'parttime', type: 'parttime' },
-      { id: 'p4', name: '吳珮綺 Sherry', role: 'parttime', type: 'parttime' },
-      { id: 'p5', name: '沈宥寧 YUKI', role: 'parttime', type: 'parttime' },
-      { id: 'p6', name: '黃澤萱 ANNA', role: 'parttime', type: 'parttime' }
+      { id: 'c1', name: '瞏???Wally', role: 'coach', type: 'fulltime' },
+      { id: 'c2', name: '瘣芷撱?Timmy', role: 'coach', type: 'fulltime' },
+      { id: 'c3', name: '?蔔??Tifa', role: 'coach', type: 'fulltime' },
+      { id: 'c4', name: '蝪⊥???Nomi', role: 'coach', type: 'fulltime' },
+      { id: 'c5', name: '暺???Bryant', role: 'coach', type: 'fulltime' },
+      { id: 'c6', name: '璆祥??Jerry', role: 'coach', type: 'fulltime' },
+      { id: 'c7', name: '????Henry', role: 'coach', type: 'fulltime' },
+      { id: 'f1', name: '? Mandy', role: 'frontdesk', type: 'fulltime' },
+      { id: 'p1', name: '憪? BOBO', role: 'parttime', type: 'parttime' },
+      { id: 'p2', name: '?凋?甈?Ruby', role: 'parttime', type: 'parttime' },
+      { id: 'p3', name: '?喳?撣?LBO', role: 'parttime', type: 'parttime' },
+      { id: 'p4', name: '?喟蝬?Sherry', role: 'parttime', type: 'parttime' },
+      { id: 'p5', name: '瘝恭撖?YUKI', role: 'parttime', type: 'parttime' },
+      { id: 'p6', name: '暺黎??ANNA', role: 'parttime', type: 'parttime' }
     ];
     const cloneData = (value) => {
       if (typeof structuredClone === 'function') return structuredClone(value);
@@ -391,10 +391,10 @@
     }
     async function uploadScheduleCloud() {
       if (!window.saveScheduleToCloud) {
-        showToast('Firebase 尚未完成載入');
+        showToast('Firebase 撠摰?頛');
         return false;
       }
-      state.cloudStatus = '上傳中...';
+      state.cloudStatus = '銝銝?..';
       render();
       try {
         await window.saveScheduleToCloud({
@@ -403,14 +403,14 @@
           requests: state.requests,
           source: 'fitness-schedule'
         });
-        state.cloudStatus = `已上傳 ${new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`;
-        showToast('班表已上傳雲端');
+        state.cloudStatus = `撌脖???${new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`;
+        showToast('?剛”撌脖??喲蝡?);
         render();
         return true;
       } catch (error) {
         console.error('Cloud schedule upload failed:', error);
-        state.cloudStatus = '雲端上傳失敗';
-        showToast('雲端上傳失敗，請檢查 Firebase 權限');
+        state.cloudStatus = '?脩垢銝憭望?';
+        showToast('?脩垢銝憭望?嚗?瑼Ｘ Firebase 甈?');
         render();
         return false;
       }
@@ -420,7 +420,7 @@
       try {
         const data = await window.loadScheduleFromCloud();
         if (!data) {
-          if (!options.silent) showToast('雲端目前沒有班表');
+          if (!options.silent) showToast('?脩垢?桀?瘝??剛”');
           return false;
         }
         if (Array.isArray(data.employees)) state.employees = data.employees;
@@ -428,13 +428,13 @@
         if (Array.isArray(data.requests)) state.requests = data.requests;
         normalizeEmployeeOrder();
         save();
-        state.cloudStatus = '已讀取雲端';
-        if (!options.silent) showToast('已讀取雲端班表');
+        state.cloudStatus = '撌脰??蝡?;
+        if (!options.silent) showToast('撌脰??蝡舐銵?);
         render();
         return true;
       } catch (error) {
         console.error('Cloud schedule load failed:', error);
-        if (!options.silent) showToast('讀取雲端失敗');
+        if (!options.silent) showToast('霈?蝡臬仃??);
         return false;
       }
     }
@@ -479,7 +479,7 @@
         const d = new Date(current);
         d.setDate(current.getDate() + i);
         const key = formatDate(d);
-        return { date: d, key, dow: ['日','一','二','三','四','五','六'][d.getDay()], monday: d.getDay() === 1, weekend: d.getDay() === 0 || d.getDay() === 6, today: key === today, holiday: holidayName(key) };
+        return { date: d, key, dow: ['??,'銝','鈭?,'銝?,'??,'鈭?,'??][d.getDay()], monday: d.getDay() === 1, weekend: d.getDay() === 0 || d.getDay() === 6, today: key === today, holiday: holidayName(key) };
       });
     }
     function isMobileView() {
@@ -534,7 +534,7 @@
       if (!match) return null;
       const start = Number(match[1]);
       const end = Number(match[2]);
-      return { id: shiftId, name: `自訂 ${start}:00-${end}:00`, short: String(start), start, end, work: true, custom: true };
+      return { id: shiftId, name: `?芾? ${start}:00-${end}:00`, short: String(start), start, end, work: true, custom: true };
     }
     function shiftClass(shiftId) {
       return shifts[shiftId] ? shiftId : 'CUSTOM';
@@ -579,12 +579,12 @@
         const assigned = state.schedule[day.key] || {};
         const working = state.employees.filter(emp => assigned[emp.id] && shiftInfo(assigned[emp.id])?.work);
         [7, 12, 16].forEach(hour => {
-          if (!working.some(emp => shiftInfo(assigned[emp.id])?.start === hour)) messages.push(`${day.key} 沒有 ${hour} 點人員上班`);
+          if (!working.some(emp => shiftInfo(assigned[emp.id])?.start === hour)) messages.push(`${day.key} 瘝? ${hour} 暺犖?∩??苜);
         });
-        if (!working.some(emp => roleMatches(emp, 'coach'))) messages.push(`${day.key} 沒有教練上班`);
+        if (!working.some(emp => roleMatches(emp, 'coach'))) messages.push(`${day.key} 瘝??毀銝`);
         const hasFrontdesk = working.some(emp => emp.role === 'frontdesk') || working.some(emp => shiftInfo(assigned[emp.id])?.start === 16);
-        if (!hasFrontdesk) messages.push(`${day.key} 沒有櫃台人員上班`);
-        if ((day.weekend || day.holiday) && working.length < 3) messages.push(`${day.key} 假日人力少於 3 人`);
+        if (!hasFrontdesk) messages.push(`${day.key} 瘝?瑹鈭箏銝`);
+        if ((day.weekend || day.holiday) && working.length < 3) messages.push(`${day.key} ?鈭箏?撠 3 鈭槁);
       });
       return messages.slice(0, 8);
     }
@@ -607,7 +607,7 @@
       return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
     }
     function dateRangeLabel(item) {
-      if (Array.isArray(item.dates) && item.dates.length) return [...item.dates].sort().map(shortDateLabel).join('、');
+      if (Array.isArray(item.dates) && item.dates.length) return [...item.dates].sort().map(shortDateLabel).join('??);
       const start = item.startDate || item.date;
       const end = item.endDate || item.date;
       return start === end ? shortDateLabel(start) : `${shortDateLabel(start)} ~ ${shortDateLabel(end)}`;
@@ -617,15 +617,15 @@
       return `${Number(dateKey.slice(5, 7))}/${Number(dateKey.slice(8, 10))}`;
     }
     function selectedDatesText() {
-      return `已選 ${state.requestSelectedDates.length} 天：${state.requestSelectedDates.length ? [...state.requestSelectedDates].sort().map(shortDateLabel).join('、') : '請點選可上班日期'}`;
+      return `撌脤 ${state.requestSelectedDates.length} 憭抬?${state.requestSelectedDates.length ? [...state.requestSelectedDates].sort().map(shortDateLabel).join('??) : '隢??詨銝?交?'}`;
     }
     function buildGoogleFormDetails(name, dates, shift, note) {
       const shiftName = shiftInfo(shift)?.name || shift;
       return [
-        `姓名：${name}`,
-        `希望日期：${dates.map(shortDateLabel).join('、')}`,
-        `希望班別：${shiftName}`,
-        note ? `備註：${note}` : ''
+        `憪?嚗?{name}`,
+        `撣??交?嚗?{dates.map(shortDateLabel).join('??)}`,
+        `撣??剖嚗?{shiftName}`,
+        note ? `?酉嚗?{note}` : ''
       ].filter(Boolean).join('\n');
     }
     function submitGoogleForm(details) {
@@ -660,23 +660,23 @@
     function layout(content) {
       document.getElementById('app').innerHTML = `
         <div class="app"><div class="shell ${state.topCollapsed ? 'top-collapsed' : ''}">
-          <button class="secondary mobile-top-toggle" data-action="toggleTop">${state.topCollapsed ? '展開上方 ▲' : '收合上方 ▼'}</button>
+          <button class="secondary mobile-top-toggle" data-action="toggleTop">${state.topCollapsed ? '撅?銝 ?? : '?嗅?銝 ??}</button>
           <header>
-            <div><h1>FITNESS SCHEDULE</h1><div class="subtitle" style="margin:2px 0 0">健身房排班系統 Pro</div><div class="mobile-badge">手機版一週視圖</div></div>
+            <div><h1>FITNESS SCHEDULE</h1><div class="subtitle" style="margin:2px 0 0">?亥澈?踵??剔頂蝯?Pro</div><div class="mobile-badge">?????梯???/div></div>
             <div class="header-actions">
-              <span class="mode">模式：${state.view === 'admin' ? '管理者' : '員工檢視'}</span>
-              <button class="secondary" data-action="logout">登出</button>
+              <span class="mode">璅∪?嚗?{state.view === 'admin' ? '蝞∠??? : '?∪極瑼Ｚ?'}</span>
+              <button class="secondary" data-action="logout">?餃</button>
             </div>
           </header>
           <nav>
             <div class="tabs">
-              <button class="tab ${state.tab === 'weekly' ? 'active' : ''}" data-tab="weekly">四週班表</button>
-              <button class="tab ${state.tab === 'daily' ? 'active' : ''}" data-tab="daily">每日時間軸</button>
-              <button class="tab ${state.tab === 'requests' ? 'active' : ''}" data-tab="requests">${state.view === 'admin' ? '希望班' : '填希望班'}</button>
-              ${state.view === 'admin' ? `<button class="tab ${state.tab === 'employees' ? 'active' : ''}" data-tab="employees">員工</button>` : ''}
+              <button class="tab ${state.tab === 'weekly' ? 'active' : ''}" data-tab="weekly">?梁銵?/button>
+              <button class="tab ${state.tab === 'daily' ? 'active' : ''}" data-tab="daily">瘥??頠?/button>
+              <button class="tab ${state.tab === 'requests' ? 'active' : ''}" data-tab="requests">${state.view === 'admin' ? '撣??? : '憛怠??'}</button>
+              ${state.view === 'admin' ? `<button class="tab ${state.tab === 'employees' ? 'active' : ''}" data-tab="employees">?∪極</button>` : ''}
             </div>
           </nav>
-          ${state.view === 'employee' ? '<div class="notice">目前是員工檢視模式，可以查看班表，也可以填寫希望班給主管參考。</div>' : ''}
+          ${state.view === 'employee' ? '<div class="notice">?桀??臬撌交炎閬芋撘??臭誑?亦??剛”嚗??臭誑憛怠神撣??剔策銝餌恣??/div>' : ''}
           <main>${content}</main>
         </div></div>`;
     }
@@ -685,15 +685,15 @@
         <div class="login">
           <section class="login-card">
             <h1 style="text-align:center">FITNESS SCHEDULE</h1>
-            <div class="subtitle" style="text-align:center">健身房排班系統 Pro</div>
+            <div class="subtitle" style="text-align:center">?亥澈?踵??剔頂蝯?Pro</div>
             <form id="loginForm">
-              <input id="password" type="password" placeholder="輸入密碼" autofocus />
+              <input id="password" type="password" placeholder="頛詨撖Ⅳ" autofocus />
               <div class="error" id="loginError"></div>
-              <button class="primary" style="width:100%; padding:13px">登入</button>
+              <button class="primary" style="width:100%; padding:13px">?餃</button>
             </form>
             <div class="hint">
-              <div>員工檢視：B12345</div>
-              <div>主管排班請輸入管理者密碼</div>
+              <div>?∪極瑼Ｚ?嚗12345</div>
+              <div>銝餌恣?隢撓?亦恣??蝣?/div>
             </div>
           </section>
         </div>`;
@@ -703,7 +703,7 @@
         if (pw === 'A12345') state.view = 'admin';
         else if (pw === 'B12345') state.view = 'employee';
         else {
-          document.getElementById('loginError').textContent = '密碼錯誤，請重新輸入';
+          document.getElementById('loginError').textContent = '撖Ⅳ?航炊嚗??頛詨';
           return;
         }
         render();
@@ -717,10 +717,10 @@
       const alertPreview = alerts[0] || '';
       const employees = sortEmployees(state.employees.filter(employeeVisible));
       const controlsCollapsed = mobile && !state.controlsOpen;
-      const stepLabel = scheduleStepDays() === 7 ? '週' : '四週';
-      const filterOptions = `<option value="all">全部員工</option>${roles.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}`;
+      const stepLabel = scheduleStepDays() === 7 ? '?? : '??;
+      const filterOptions = `<option value="all">?券?∪極</option>${roles.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}`;
       const selectedPeople = Array.isArray(state.personFilter) ? state.personFilter : [];
-      const personChips = `<button class="person-chip ${selectedPeople.length ? '' : 'active'}" data-person-filter="all">全部人員</button>${sortEmployees(state.employees.filter(emp => roleMatches(emp, state.filter))).map(emp => `<button class="person-chip ${selectedPeople.includes(emp.id) ? 'active' : ''}" data-person-filter="${emp.id}">${escapeHtml(emp.name)}</button>`).join('')}`;
+      const personChips = `<button class="person-chip ${selectedPeople.length ? '' : 'active'}" data-person-filter="all">?券鈭箏</button>${sortEmployees(state.employees.filter(emp => roleMatches(emp, state.filter))).map(emp => `<button class="person-chip ${selectedPeople.includes(emp.id) ? 'active' : ''}" data-person-filter="${emp.id}">${escapeHtml(emp.name)}</button>`).join('')}`;
       const rows = employees.map(emp => {
         const cells = days.map(day => {
           const id = state.schedule[day.key]?.[emp.id];
@@ -732,54 +732,54 @@
       const head = days.map(day => {
         const dayClass = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
         const copyClass = state.copyDaySource === day.key ? 'copy-source' : '';
-        const copyTitle = state.view === 'admin' ? (state.copyDaySource ? `貼上到 ${day.key}` : `複製 ${day.key} 整天班表`) : '';
-        return `<th class="date-col ${dayClass} ${copyClass} ${state.view === 'admin' ? 'copy-date' : ''}" ${state.view === 'admin' ? `data-copy-date="${day.key}" title="${copyTitle}"` : ''}><div class="date">${day.key.slice(5).replace('-', '/')}</div><div class="dow">${day.dow}</div>${day.monday && !day.holiday ? '<div class="holiday" style="background:#a855f7">開會</div>' : ''}${day.holiday ? `<div class="holiday" title="${day.holiday}">${day.holiday}</div>` : ''}</th>`;
+        const copyTitle = state.view === 'admin' ? (state.copyDaySource ? `鞎潔???${day.key}` : `銴ˊ ${day.key} ?游予?剛”`) : '';
+        return `<th class="date-col ${dayClass} ${copyClass} ${state.view === 'admin' ? 'copy-date' : ''}" ${state.view === 'admin' ? `data-copy-date="${day.key}" title="${copyTitle}"` : ''}><div class="date">${day.key.slice(5).replace('-', '/')}</div><div class="dow">${day.dow}</div>${day.monday && !day.holiday ? '<div class="holiday" style="background:#a855f7">??</div>' : ''}${day.holiday ? `<div class="holiday" title="${day.holiday}">${day.holiday}</div>` : ''}</th>`;
       }).join('');
       layout(`
         <section class="panel">
           <button class="secondary mobile-controls-toggle" data-action="toggleControls">
-            <span>${days[0].key} 到 ${days[days.length - 1].key}</span>
-            <span>${controlsCollapsed ? '展開工具 ▼' : '收合工具 ▲'}</span>
+            <span>${days[0].key} ??${days[days.length - 1].key}</span>
+            <span>${controlsCollapsed ? '撅?撌亙 ?? : '?嗅?撌亙 ??}</span>
           </button>
-          ${controlsCollapsed ? `<div class="mobile-week-switch"><button class="secondary" data-action="prev4">← 前一${stepLabel}</button><span>${days[0].key.slice(5)} - ${days[days.length - 1].key.slice(5)}</span><button class="secondary" data-action="next4">後一${stepLabel} →</button></div>` : ''}
+          ${controlsCollapsed ? `<div class="mobile-week-switch"><button class="secondary" data-action="prev4">????${stepLabel}</button><span>${days[0].key.slice(5)} - ${days[days.length - 1].key.slice(5)}</span><button class="secondary" data-action="next4">敺?${stepLabel} ??/button></div>` : ''}
           <div class="weekly-controls ${controlsCollapsed ? 'collapsed' : ''}">
           <div class="panel-head">
             <div class="toolbar">
-              <button class="secondary" data-action="prev4">${mobile ? '前一週' : '前四週'}</button>
-              <div class="range-title">${days[0].key} 到 ${days[days.length - 1].key}</div>
-              <button class="secondary" data-action="next4">${mobile ? '後一週' : '後四週'}</button>
-              <button class="secondary" data-action="todayRange">回排班週</button>
+              <button class="secondary" data-action="prev4">${mobile ? '???? : '????}</button>
+              <div class="range-title">${days[0].key} ??${days[days.length - 1].key}</div>
+              <button class="secondary" data-action="next4">${mobile ? '敺??? : '敺???}</button>
+              <button class="secondary" data-action="todayRange">???剝?/button>
             </div>
             <div class="toolbar">
               <select data-action="filter">${filterOptions}</select>
-              ${state.view === 'admin' ? `<button class="secondary" data-action="copyWeek">複製上週</button><button class="secondary ${state.copyDayMode ? 'active' : ''}" data-action="toggleCopyDay">${state.copyDayMode ? (state.copyDaySource ? '貼上日期中' : '選來源日') : '複製日期'}</button>${state.copyDayMode || state.copyDaySource ? '<button class="secondary" data-action="cancelCopyDay">取消複製</button>' : ''}<button class="secondary" data-action="fillOff">空格設休</button><button class="secondary" data-action="uploadCloud">上傳雲端</button><button class="secondary" data-action="loadCloud">讀取雲端</button><button class="secondary" data-action="undo">復原</button><button class="secondary" data-action="exportData">匯出資料</button><button class="secondary" data-action="importData">匯入資料</button>` : ''}
-              <button class="primary" data-action="print">列印</button>
+              ${state.view === 'admin' ? `<button class="secondary" data-action="copyWeek">銴ˊ銝?/button><button class="secondary ${state.copyDayMode ? 'active' : ''}" data-action="toggleCopyDay">${state.copyDayMode ? (state.copyDaySource ? '鞎潔??交?銝? : '?訾?皞') : '銴ˊ?交?'}</button>${state.copyDayMode || state.copyDaySource ? '<button class="secondary" data-action="cancelCopyDay">??銴ˊ</button>' : ''}<button class="secondary" data-action="fillOff">蝛箸閮凋?</button><button class="secondary" data-action="uploadCloud">銝?脩垢</button><button class="secondary" data-action="loadCloud">霈?蝡?/button><button class="secondary" data-action="undo">敺拙?</button><button class="secondary" data-action="exportData">?臬鞈?</button><button class="secondary" data-action="importData">?臬鞈?</button>` : ''}
+              <button class="primary" data-action="print">?</button>
               <input id="importDataFile" type="file" accept="application/json,.json" style="display:none" data-action="importDataFile" />
             </div>
           </div>
           ${state.cloudStatus ? `<div class="notice" style="margin:8px 12px"><span class="cloud-pill">${escapeHtml(state.cloudStatus)}</span></div>` : ''}
-          <div class="people-filter"><span>只看</span>${personChips}</div>
-          ${state.view === 'admin' ? `<div class="quickbar"><span>快速排班</span>${Object.values(shifts).map(s => `<button class="chip ${state.quick === s.id ? 'active' : ''}" data-quick="${s.id}">${s.name}</button>`).join('')}<button class="chip ${state.quick === 'CLEAR' ? 'active' : ''}" data-quick="CLEAR">清除</button></div>` : ''}
+          <div class="people-filter"><span>?芰?</span>${personChips}</div>
+          ${state.view === 'admin' ? `<div class="quickbar"><span>敹恍???/span>${Object.values(shifts).map(s => `<button class="chip ${state.quick === s.id ? 'active' : ''}" data-quick="${s.id}">${s.name}</button>`).join('')}<button class="chip ${state.quick === 'CLEAR' ? 'active' : ''}" data-quick="CLEAR">皜</button></div>` : ''}
           ${alerts.length ? `<div class="alerts-panel">
             <button class="alerts-toggle" data-action="toggleAlerts">
-              <span class="alerts-preview">提醒 ${alerts.length} 則${state.alertsOpen ? '' : `：${escapeHtml(alertPreview)}`}</span>
-              <span class="alerts-action">${state.alertsOpen ? '收合提醒 ▲' : '點我展開 ▼'}</span>
+              <span class="alerts-preview">?? ${alerts.length} ??{state.alertsOpen ? '' : `嚗?{escapeHtml(alertPreview)}`}</span>
+              <span class="alerts-action">${state.alertsOpen ? '?嗅??? ?? : '暺?撅? ??}</span>
             </button>
-            ${state.alertsOpen ? `<div class="alerts">${alerts.map(a => `<div>提醒：${escapeHtml(a)}</div>`).join('')}</div>` : ''}
+            ${state.alertsOpen ? `<div class="alerts">${alerts.map(a => `<div>??嚗?{escapeHtml(a)}</div>`).join('')}</div>` : ''}
           </div>` : ''}
           </div>
-          <div class="table-wrap"><table><thead><tr><th class="name-col">員工</th>${head}<th class="signature-col">簽名</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th class="name-col">?∪極</th>${head}<th class="signature-col">蝪賢?</th></tr></thead><tbody>${rows}</tbody></table></div>
         </section>
         <div class="picker ${state.selected ? 'open' : ''}" id="picker"><div class="picker-card">
-          <button class="picker-close" data-action="closePicker" title="關閉">×</button>
+          <button class="picker-close" data-action="closePicker" title="??">?</button>
           <div class="picker-title">${state.selected ? `${state.selected.date} - ${escapeHtml(state.employees.find(e => e.id === state.selected.emp)?.name || '')}` : ''}</div>
           <div class="picker-grid">${Object.values(shifts).map(s => `<button class="shift ${s.id}" data-pick="${s.id}">${s.name}</button>`).join('')}</div>
           <div class="custom-shift">
-            <input id="customStart" type="number" min="0" max="23" value="10" aria-label="開始時間" />
-            <input id="customEnd" type="number" min="1" max="24" value="18" aria-label="結束時間" />
-            <button class="primary" data-action="saveCustomShift">自訂</button>
+            <input id="customStart" type="number" min="0" max="23" value="10" aria-label="????" />
+            <input id="customEnd" type="number" min="1" max="24" value="18" aria-label="蝯???" />
+            <button class="primary" data-action="saveCustomShift">?芾?</button>
           </div>
-          <button class="danger" style="width:100%; margin-top:10px" data-pick="">清除班別</button>
+          <button class="danger" style="width:100%; margin-top:10px" data-pick="">皜?剖</button>
         </div></div>`);
       document.querySelector('[data-action="filter"]').value = state.filter;
     }
@@ -797,13 +797,13 @@
       layout(`
         <section class="panel">
           <div class="panel-head">
-            <button class="secondary" data-action="prevDay">前一天</button>
+            <button class="secondary" data-action="prevDay">??憭?/button>
             <div class="range-title">${key}${holiday ? `<div style="color:#dc2626;font-size:12px">${holiday}</div>` : ''}</div>
-            <button class="secondary" data-action="nextDay">後一天</button>
+            <button class="secondary" data-action="nextDay">敺?憭?/button>
           </div>
           <div class="table-wrap"><div class="timeline">
-            <div class="timeline-grid"><div>員工</div>${hours.map(h => `<div>${h}:00</div>`).join('')}</div>
-            ${rows || '<div class="empty">這天尚未安排上班人員</div>'}
+            <div class="timeline-grid"><div>?∪極</div>${hours.map(h => `<div>${h}:00</div>`).join('')}</div>
+            ${rows || '<div class="empty">?予撠摰?銝鈭箏</div>'}
           </div></div>
         </section>`);
     }
@@ -815,20 +815,20 @@
           return `<tr>
             <td><input id="editName" value="${escapeHtml(emp.name)}" /></td>
             <td><select id="editRole">${roleOptions(emp.role)}</select></td>
-            <td style="text-align:right"><button class="primary" data-action="saveEmployee" data-edit="${emp.id}">儲存</button> <button class="secondary" data-action="cancelEmployeeEdit">取消</button></td>
+            <td style="text-align:right"><button class="primary" data-action="saveEmployee" data-edit="${emp.id}">?脣?</button> <button class="secondary" data-action="cancelEmployeeEdit">??</button></td>
           </tr>`;
         }
-        return `<tr><td><b>${escapeHtml(emp.name)}</b></td><td>${roleLabel(emp.role)}</td><td style="text-align:right"><button class="secondary" data-action="moveEmployee" data-edit="${emp.id}" data-move="up" ${index === 0 ? 'disabled' : ''}>上移</button> <button class="secondary" data-action="moveEmployee" data-edit="${emp.id}" data-move="down" ${index === ordered.length - 1 ? 'disabled' : ''}>下移</button> <button class="secondary" data-action="editEmployee" data-edit="${emp.id}">編輯</button> <button class="danger" data-delete="${emp.id}">刪除</button></td></tr>`;
+        return `<tr><td><b>${escapeHtml(emp.name)}</b></td><td>${roleLabel(emp.role)}</td><td style="text-align:right"><button class="secondary" data-action="moveEmployee" data-edit="${emp.id}" data-move="up" ${index === 0 ? 'disabled' : ''}>銝宏</button> <button class="secondary" data-action="moveEmployee" data-edit="${emp.id}" data-move="down" ${index === ordered.length - 1 ? 'disabled' : ''}>銝宏</button> <button class="secondary" data-action="editEmployee" data-edit="${emp.id}">蝺刻摩</button> <button class="danger" data-delete="${emp.id}">?芷</button></td></tr>`;
       }).join('');
       layout(`
         <section class="panel">
           <div class="employee-form">
-            <input id="newName" placeholder="輸入員工姓名" />
+            <input id="newName" placeholder="頛詨?∪極憪?" />
             <select id="newRole">${roleOptions('coach')}</select>
-            <button class="primary" data-action="addEmployee">新增</button>
+            <button class="primary" data-action="addEmployee">?啣?</button>
           </div>
-          <div class="notice" style="margin:12px">員工排序會同步影響班表列順序，可以照上班先後調整。</div>
-          <div class="table-wrap"><table class="employee-table"><thead><tr><th>員工</th><th>職務</th><th style="text-align:right">操作</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <div class="notice" style="margin:12px">?∪極????甇亙蔣?輻銵典???嚗隞亦銝??隤踵??/div>
+          <div class="table-wrap"><table class="employee-table"><thead><tr><th>?∪極</th><th>?瑕?</th><th style="text-align:right">??</th></tr></thead><tbody>${rows}</tbody></table></div>
         </section>`);
     }
     function renderRequests() {
@@ -839,13 +839,13 @@
       });
       const selectedDates = new Set(state.requestSelectedDates);
       const calendarCells = [
-        ...['日', '一', '二', '三', '四', '五', '六'].map(day => `<div class="request-dow">${day}</div>`),
+        ...['??, '銝', '鈭?, '銝?, '??, '鈭?, '??].map(day => `<div class="request-dow">${day}</div>`),
         ...getMonthDays(state.requestMonth).map(date => date
           ? `<button class="request-day ${selectedDates.has(date) ? 'selected' : ''}" data-request-date="${date}">${Number(date.slice(8))}</button>`
           : '<button class="request-day blank"></button>'
         )
       ].join('');
-      const employeeOptions = sortEmployees(state.employees).map(emp => `<option value="${emp.id}">${escapeHtml(emp.name)}（${roleLabel(emp.role)}）</option>`).join('');
+      const employeeOptions = sortEmployees(state.employees).map(emp => `<option value="${emp.id}">${escapeHtml(emp.name)}嚗?{roleLabel(emp.role)}嚗?/option>`).join('');
       const shiftOptions = Object.values(shifts).filter(s => s.work).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
       const rows = sorted.map(item => `
         <div class="request-card">
@@ -858,7 +858,7 @@
             </div>
             ${item.note ? `<div class="request-note">${escapeHtml(item.note)}</div>` : ''}
           </div>
-          ${state.view === 'admin' ? `<button class="danger" data-request-delete="${item.id}">刪除</button>` : ''}
+          ${state.view === 'admin' ? `<button class="danger" data-request-delete="${item.id}">?芷</button>` : ''}
         </div>
       `).join('');
       layout(`
@@ -867,17 +867,17 @@
             <div class="request-form">
               <select id="requestEmployee">${employeeOptions}</select>
               <input type="month" value="${state.requestMonth}" data-action="requestMonth" />
-              <button class="secondary" data-action="currentRequestMonth">回本月</button>
+              <button class="secondary" data-action="currentRequestMonth">???/button>
               <select id="requestShift">${shiftOptions}</select>
-              <input id="requestContact" type="text" placeholder="聯絡方式（電話或 LINE）" />
-              <button id="submit-btn" class="primary" data-action="addRequest">送出</button>
+              <input id="requestContact" type="text" placeholder="?舐窗?孵?嚗閰望? LINE嚗? />
+              <button id="submit-btn" class="primary" data-action="addRequest">?</button>
               <div class="request-calendar">${calendarCells}</div>
               <div class="request-selected" id="requestSelectedSummary">${selectedDatesText()}</div>
-              <textarea id="requestNote" placeholder="備註，例如：只方便早班、可配合調整"></textarea>
+              <textarea id="requestNote" placeholder="?酉嚗?憒??芣靘踵?准??隤踵"></textarea>
               <p id="status-msg" class="notice" style="display:none; grid-column:1 / -1; margin:0"></p>
             </div>
-            <div class="notice" style="margin:12px">送出後會直接寫入 Firebase Firestore 的 customer_inquiries 集合。</div>
-          ` : `<div class="notice" style="margin:12px">下面是 Firebase / 本機暫存的希望班紀錄。主管可到 Firebase Console 的 customer_inquiries 查看員工送出的資料。</div>`}
+            <div class="notice" style="margin:12px">?敺??湔撖怠 Firebase Firestore ??customer_inquiries ????/div>
+          ` : `<div class="notice" style="margin:12px">銝??Firebase / ?祆??怠????蝝?蜓蝞∪??Firebase Console ??customer_inquiries ?亦??∪極?????/div>`}
           ${state.view === 'admin' && rows ? `<div class="table-wrap">${rows}</div>` : ''}
         </section>`);
     }
@@ -915,7 +915,7 @@
         requests: state.requests
       };
       downloadFile(`fitness-schedule-data-${formatDate(new Date())}.json`, JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
-      showToast('資料已匯出，可以到線上版匯入');
+      showToast('鞈?撌脣?綽??臭誑?啁?銝??臬');
     }
     function importDataFile(file) {
       if (!file) return;
@@ -924,7 +924,7 @@
         try {
           const payload = JSON.parse(String(reader.result || '{}'));
           if (!Array.isArray(payload.employees) || typeof payload.schedule !== 'object' || payload.schedule === null) {
-            showToast('匯入失敗：檔案格式不正確');
+            showToast('?臬憭望?嚗?獢撘?甇?Ⅱ');
             return;
           }
           state.employees = payload.employees;
@@ -933,10 +933,10 @@
           state.undo = [];
           normalizeEmployeeOrder();
           save();
-          showToast('資料已匯入');
+          showToast('鞈?撌脣??);
           render();
         } catch {
-          showToast('匯入失敗：檔案無法讀取');
+          showToast('?臬憭望?嚗?獢瘜???);
         }
       };
       reader.readAsText(file, 'utf-8');
@@ -946,7 +946,7 @@
       const employees = sortEmployees(state.employees.filter(employeeVisible));
       const head = days.map(day => {
         const cls = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
-        return `<th class="${cls}"><div>${day.key.slice(5).replace('-', '/')}</div><div>${day.dow}</div>${day.monday && !day.holiday ? '<small class="meeting">開會</small>' : ''}${day.holiday ? `<small class="holiday">${escapeHtml(day.holiday)}</small>` : ''}</th>`;
+        return `<th class="${cls}"><div>${day.key.slice(5).replace('-', '/')}</div><div>${day.dow}</div>${day.monday && !day.holiday ? '<small class="meeting">??</small>' : ''}${day.holiday ? `<small class="holiday">${escapeHtml(day.holiday)}</small>` : ''}</th>`;
       }).join('');
       const rows = employees.map(emp => {
         const cells = days.map(day => {
@@ -986,19 +986,19 @@
 </head>
 <body>
   <h1>FITNESS SCHEDULE</h1>
-  <div class="range">${days[0].key} 到 ${days[27].key}</div>
+  <div class="range">${days[0].key} ??${days[27].key}</div>
   <table>
-    <thead><tr><th class="name">員工</th>${head}<th class="signature">簽名</th></tr></thead>
+    <thead><tr><th class="name">?∪極</th>${head}<th class="signature">蝪賢?</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
 </body>
 </html>`;
       const filename = `fitness-schedule-${days[0].key}.html`;
       downloadFile(filename, html, 'text/html;charset=utf-8');
-      showToast(`HTML 已下載：${filename}`);
+      showToast(`HTML 撌脖?頛?${filename}`);
     }
     function printSchedule() {
-      showToast('正在開啟列印視窗。若沒有跳出，請按 Ctrl + P。');
+      showToast('甇????閬??瘝?頝喳嚗???Ctrl + P??);
       setTimeout(() => window.print(), 80);
     }
     function render() {
@@ -1044,12 +1044,12 @@
         state.copyDayMode = true;
         if (!state.copyDaySource) {
           state.copyDaySource = date;
-          showToast(`已複製 ${date}，再點其他日期貼上`);
+          showToast(`撌脰?鋆?${date}嚗?暺隞?票銝);
           render();
           return;
         }
         if (state.copyDaySource === date) {
-          showToast('已選這天當來源，請點其他日期貼上');
+          showToast('撌脤?予?嗡?皞?隢??嗡??交?鞎潔?');
           return;
         }
         const next = cloneData(state.schedule);
@@ -1057,7 +1057,7 @@
         if (Object.keys(source).length) next[date] = source;
         else delete next[date];
         pushSchedule(next);
-        showToast(`已貼上到 ${date}`);
+        showToast(`撌脰票銝 ${date}`);
         render();
         return;
       }
@@ -1066,12 +1066,12 @@
         if (state.copyDayMode) {
           if (!state.copyDaySource) {
             state.copyDaySource = date;
-            showToast(`已複製 ${date}，再點其他日期任一格貼上`);
+            showToast(`撌脰?鋆?${date}嚗?暺隞?遙銝?潸票銝);
             render();
             return;
           }
           if (state.copyDaySource === date) {
-            showToast('已選這天當來源，請點其他日期貼上');
+            showToast('撌脤?予?嗡?皞?隢??嗡??交?鞎潔?');
             return;
           }
           const next = cloneData(state.schedule);
@@ -1079,7 +1079,7 @@
           if (Object.keys(source).length) next[date] = source;
           else delete next[date];
           pushSchedule(next);
-          showToast(`已貼上到 ${date}`);
+          showToast(`撌脰票銝 ${date}`);
           render();
           return;
         }
@@ -1118,7 +1118,7 @@
         const start = Number(document.getElementById('customStart')?.value);
         const end = Number(document.getElementById('customEnd')?.value);
         if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end > 24 || end <= start) {
-          showToast('請輸入正確時間，例如 10 到 18');
+          showToast('隢撓?交迤蝣箸???靘? 10 ??18');
           return;
         }
         const selected = state.selected;
@@ -1141,7 +1141,7 @@
       if (action === 'toggleCopyDay') {
         state.copyDayMode = !state.copyDayMode;
         if (!state.copyDayMode) state.copyDaySource = null;
-        showToast(state.copyDayMode ? '請點來源日期的任一格' : '已關閉複製日期');
+        showToast(state.copyDayMode ? '隢?靘??交??遙銝?? : '撌脤???鋆賣??);
         render();
         return;
       }
@@ -1239,31 +1239,31 @@
           statusMsg.style.color = isError ? '#dc2626' : '#166534';
         };
         if (!name || !contact || !note || !dates.length) {
-          setStatus('請完整填寫姓名、聯絡方式、日期與需求說明', true);
+          setStatus('隢??游‵撖怠??蝯⊥撘???瘙牧??, true);
           return;
         }
         if (!window.writeCustomerInquiryToFirestore) {
-          setStatus('Firebase 尚未完成載入，請稍後再試', true);
+          setStatus('Firebase 撠摰?頛嚗?蝔??岫', true);
           return;
         }
         const requestLog = { id: 'req_' + Date.now(), name, contact, date: dates[0], dates, shift, shiftName: shiftInfo(shift)?.name || shift, note, createdAt: formatDate(new Date()) };
         try {
           if (submitButton) submitButton.disabled = true;
-          setStatus('正在傳送...');
+          setStatus('甇??喲?..');
           await window.writeCustomerInquiryToFirestore({ type: 'shift_request', ...requestLog });
-          console.log('資料已成功寫入資料庫');
+          console.log('鞈?撌脫??神?亥??澈');
           state.requests.push(requestLog);
           state.requestSelectedDates = [];
           document.getElementById('requestContact').value = '';
           document.getElementById('requestNote').value = '';
           save();
           updateRequestSelectionDisplay();
-          setStatus('🎉 訊息已成功送出！');
-          showToast('訊息已成功送出');
+          setStatus('?? 閮撌脫??嚗?);
+          showToast('閮撌脫??');
           setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
         } catch (error) {
-          console.error('Firebase 寫入失敗:', error);
-          setStatus('❌ 送出失敗，請稍後再試', true);
+          console.error('Firebase 撖怠憭望?:', error);
+          setStatus('???憭望?嚗?蝔??岫', true);
         } finally {
           if (submitButton) submitButton.disabled = false;
         }
@@ -1307,3 +1307,4 @@
   </script>
 </body>
 </html>
+
