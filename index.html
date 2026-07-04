@@ -582,7 +582,8 @@
           if (!working.some(emp => shiftInfo(assigned[emp.id])?.start === hour)) messages.push(`${day.key} 沒有 ${hour} 點人員上班`);
         });
         if (!working.some(emp => roleMatches(emp, 'coach'))) messages.push(`${day.key} 沒有教練上班`);
-        if (!working.some(emp => emp.role === 'frontdesk')) messages.push(`${day.key} 沒有櫃台人員上班`);
+        const hasFrontdesk = working.some(emp => emp.role === 'frontdesk') || working.some(emp => shiftInfo(assigned[emp.id])?.start === 16);
+        if (!hasFrontdesk) messages.push(`${day.key} 沒有櫃台人員上班`);
         if ((day.weekend || day.holiday) && working.length < 3) messages.push(`${day.key} 假日人力少於 3 人`);
       });
       return messages.slice(0, 8);
