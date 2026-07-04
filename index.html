@@ -116,9 +116,6 @@
     .request-main { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .request-pill { border: 1px solid var(--line); border-radius: 999px; background: #f8fafc; padding: 5px 9px; color: #475569; font-size: 12px; font-weight: 900; }
     .request-note { grid-column: 1 / -1; color: #475569; font-size: 13px; line-height: 1.6; }
-    .google-form-wrap { height: 100%; min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px; background: #f8fafc; }
-    .google-form-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
-    .google-form-frame { flex: 1; min-height: 620px; width: 100%; border: 1px solid var(--line); border-radius: 14px; background: white; }
     .timeline { min-width: 900px; padding: 14px; }
     .timeline-grid { display: grid; grid-template-columns: 120px repeat(17, 48px); border-bottom: 1px solid var(--line); }
     .timeline-grid > div { padding: 8px 4px; font-size: 12px; font-weight: 850; border-right: 1px solid #eef2f7; }
@@ -231,8 +228,7 @@
       projectId: 'igym-1fca5',
       storageBucket: 'igym-1fca5.firebasestorage.app',
       messagingSenderId: '225172176853',
-      appId: '1:225172176853:web:aa924ce203f7a948a1875c',
-      measurementId: 'G-NVH2886M20'
+      appId: '1:225172176853:web:aa924ce203f7a948a1875c'
     };
 
     const firebaseApp = initializeApp(firebaseConfig);
@@ -248,16 +244,19 @@
         userAgent: navigator.userAgent
       });
     };
+    window.writeCustomerInquiryToFirestore = async function writeCustomerInquiryToFirestore(data) {
+      return addDoc(collection(firestoreDb, 'customer_inquiries'), {
+        ...data,
+        timestamp: Date.now(),
+        pageUrl: location.href,
+        userAgent: navigator.userAgent
+      });
+    };
     window.dispatchEvent(new Event('firebase-ready'));
   </script>
 
   <script>
     const STORAGE_KEY = 'fitness-schedule-html-v1';
-    const GOOGLE_FORM_EDIT_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc6iTssu0wfFJa4HvYDPndIJ1AgtJkKRzZUVecJFC6z4eDOyg/viewform?usp=dialog';
-    const GOOGLE_FORM_VIEW_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc6iTssu0wfFJa4HvYDPndIJ1AgtJkKRzZUVecJFC6z4eDOyg/viewform?usp=dialog';
-    const GOOGLE_FORM_EMBED_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc6iTssu0wfFJa4HvYDPndIJ1AgtJkKRzZUVecJFC6z4eDOyg/viewform?embedded=true';
-    const GOOGLE_SHEET_RESPONSES_URL = 'https://docs.google.com/spreadsheets/d/1qfg5X0Mtscmwumn-01DtX-eauQDbxUgMw_ZErw0qhf4/edit?resourcekey=&gid=1109535307#gid=1109535307';
-    const GOOGLE_FORM_ENTRY_REQUEST = 'entry.279415280';
     const recurringHolidays = {
       '01-01': '元旦',
       '02-28': '228和平紀念日',
@@ -557,11 +556,11 @@
       }
       const form = document.createElement('form');
       form.method = 'POST';
-      form.action = GOOGLE_FORM_VIEW_URL.split('?')[0].replace('/viewform', '/formResponse');
+      form.action = '#';
       form.target = iframeName;
       form.style.display = 'none';
       const input = document.createElement('input');
-      input.name = GOOGLE_FORM_ENTRY_REQUEST;
+      input.name = 'disabled_legacy_form_entry';
       input.value = details;
       form.appendChild(input);
       document.body.appendChild(form);
@@ -783,13 +782,15 @@
               <input type="month" value="${state.requestMonth}" data-action="requestMonth" />
               <button class="secondary" data-action="currentRequestMonth">回本月</button>
               <select id="requestShift">${shiftOptions}</select>
-              <button class="primary" data-action="addRequest">送出</button>
+              <input id="requestContact" type="text" placeholder="聯絡方式（電話或 LINE）" />
+              <button id="submit-btn" class="primary" data-action="addRequest">送出</button>
               <div class="request-calendar">${calendarCells}</div>
               <div class="request-selected" id="requestSelectedSummary">${selectedDatesText()}</div>
               <textarea id="requestNote" placeholder="備註，例如：只方便早班、可配合調整"></textarea>
+              <p id="status-msg" class="notice" style="display:none; grid-column:1 / -1; margin:0"></p>
             </div>
-            <div class="notice" style="margin:12px">送出後會自動回到班表頁，資料會送到 Google 表單集中收集。</div>
-          ` : `<div class="notice" style="margin:12px">下面是這台電腦暫存的希望班紀錄。主管正式查看請用「回覆試算表」。${GOOGLE_SHEET_RESPONSES_URL ? `<a href="${GOOGLE_SHEET_RESPONSES_URL}" target="_blank" rel="noopener">回覆試算表</a>　` : '尚未放入試算表連結，請把 Google 試算表網址貼給我。　'}<a href="${GOOGLE_FORM_VIEW_URL}" target="_blank" rel="noopener">填寫頁</a></div>`}
+            <div class="notice" style="margin:12px">送出後會直接寫入 Firebase Firestore 的 customer_inquiries 集合。</div>
+          ` : `<div class="notice" style="margin:12px">下面是 Firebase / 本機暫存的希望班紀錄。主管可到 Firebase Console 的 customer_inquiries 查看員工送出的資料。</div>`}
           ${state.view === 'admin' && rows ? `<div class="table-wrap">${rows}</div>` : ''}
         </section>`);
     }
@@ -920,7 +921,7 @@
       else if (state.tab === 'requests') renderRequests();
       else renderWeekly();
     }
-    document.addEventListener('click', event => {
+    document.addEventListener('click', async event => {
       if (event.target.id === 'picker') {
         state.selected = null;
         render();
@@ -1136,26 +1137,46 @@
         const employee = state.employees.find(emp => emp.id === employeeId);
         const name = employee?.name || '';
         const shift = document.getElementById('requestShift').value;
+        const contact = document.getElementById('requestContact').value.trim();
         const note = document.getElementById('requestNote').value.trim();
         const dates = [...state.requestSelectedDates].sort();
-        if (!name || !dates.length) return;
-        const requestLog = { id: 'req_' + Date.now(), name, date: dates[0], dates, shift, shiftName: shiftInfo(shift)?.name || shift, note, createdAt: formatDate(new Date()) };
-        state.requests.push(requestLog);
-        submitGoogleForm(buildGoogleFormDetails(name, dates, shift, note));
-        if (window.writeLogToFirestore) {
-          window.writeLogToFirestore({ type: 'shift_request', ...requestLog })
-            .then(() => showToast('已送出並寫入 Firebase'))
-            .catch(error => {
-              console.error('Firebase write failed:', error);
-              showToast('已本機記錄，Firebase 寫入失敗，請檢查 Firestore 權限');
-            });
-        } else {
-          showToast('已本機記錄，Firebase 尚未完成載入');
+        const submitButton = document.getElementById('submit-btn');
+        const statusMsg = document.getElementById('status-msg');
+        const setStatus = (message, isError = false) => {
+          if (!statusMsg) return;
+          statusMsg.textContent = message;
+          statusMsg.style.display = 'block';
+          statusMsg.style.color = isError ? '#dc2626' : '#166534';
+        };
+        if (!name || !contact || !note || !dates.length) {
+          setStatus('請完整填寫姓名、聯絡方式、日期與需求說明', true);
+          return;
         }
-        state.requestSelectedDates = [];
-        save();
-        state.tab = 'weekly';
-        render();
+        if (!window.writeCustomerInquiryToFirestore) {
+          setStatus('Firebase 尚未完成載入，請稍後再試', true);
+          return;
+        }
+        const requestLog = { id: 'req_' + Date.now(), name, contact, date: dates[0], dates, shift, shiftName: shiftInfo(shift)?.name || shift, note, createdAt: formatDate(new Date()) };
+        try {
+          if (submitButton) submitButton.disabled = true;
+          setStatus('正在傳送...');
+          await window.writeCustomerInquiryToFirestore({ type: 'shift_request', ...requestLog });
+          console.log('資料已成功寫入資料庫');
+          state.requests.push(requestLog);
+          state.requestSelectedDates = [];
+          document.getElementById('requestContact').value = '';
+          document.getElementById('requestNote').value = '';
+          save();
+          updateRequestSelectionDisplay();
+          setStatus('🎉 訊息已成功送出！');
+          showToast('訊息已成功送出');
+          setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
+        } catch (error) {
+          console.error('Firebase 寫入失敗:', error);
+          setStatus('❌ 送出失敗，請稍後再試', true);
+        } finally {
+          if (submitButton) submitButton.disabled = false;
+        }
       }
     });
     document.addEventListener('keydown', event => {
