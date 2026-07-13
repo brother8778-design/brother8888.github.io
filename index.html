@@ -50,10 +50,11 @@
     .panel { height: 100%; overflow: hidden; display: flex; flex-direction: column; }
     .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #eef2f7; background: #f8fafc; }
     .range-title { min-width: 230px; text-align: center; font-size: 14px; font-weight: 950; }
-    .mobile-controls-toggle { display: none; width: calc(100% - 20px); margin: 10px; justify-content: space-between; align-items: center; }
+    .mobile-controls-toggle { display: flex; width: calc(100% - 20px); margin: 10px; justify-content: space-between; align-items: center; }
     .mobile-week-switch { display: none; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; padding: 0 10px 10px; }
     .mobile-week-switch span { text-align: center; color: #475569; font-size: 12px; font-weight: 950; }
-    .mobile-top-toggle { display: none; }
+    .mobile-top-toggle { display: inline-flex; width: fit-content; }
+    .top-collapsed header, .top-collapsed nav, .top-collapsed > .notice { display: none; }
     .cloud-pill { border: 1px solid #bfdbfe; border-radius: 999px; background: #eff6ff; color: #1d4ed8; padding: 6px 10px; font-size: 12px; font-weight: 950; }
     .weekly-controls { display: contents; }
     .quickbar { border-bottom: 1px solid #c7d2fe; background: #eef2ff; padding: 8px 12px; overflow-x: auto; }
@@ -87,14 +88,21 @@
     .copy-date { cursor: pointer; }
     .copy-source { outline: 2px solid #4f46e5; outline-offset: -2px; }
     .holiday { margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 4px; background: #ef4444; color: white; padding: 1px 2px; font-size: 8px; font-weight: 900; }
-    .monday { background: #f3e8ff !important; }
+    .meeting-label { background: #60a5fa !important; color: #0f172a; }
+    .monday { background: #dbeafe !important; }
     .weekend { background: #fef3c7 !important; }
     .holiday-cell { background: #fee2e2 !important; }
+    tr.group-start td, tr.group-start .name-col { border-top: 5px solid #111827 !important; }
+    tr.group-coach .name-col { background: #f8fafc; }
+    tr.group-frontdesk .name-col { background: #fff7ed; }
+    tr.group-parttime .name-col { background: #f8fafc; }
     .signature-line { height: 18px; border-bottom: 1px dashed #64748b; }
     .cell { cursor: pointer; }
     .shift { width: 100%; height: 100%; display: grid; place-items: center; border-radius: 7px; border: 1px solid; font-size: 12px; font-weight: 950; }
-    .M, .A, .N, .P, .CUSTOM { background: transparent; color: #111827; border-color: transparent; }
-    .O, .AL { background: transparent !important; color: #dc2626; border-color: transparent !important; box-shadow: none !important; }
+    .M { background: transparent; color: #2563eb; border-color: transparent; }
+    .A, .N, .P, .CUSTOM { background: transparent; color: #111827; border-color: transparent; }
+    .O { background: transparent !important; color: #dc2626; border-color: transparent !important; box-shadow: none !important; }
+    .AL { background: #fef08a !important; color: #dc2626; border-color: #facc15 !important; box-shadow: none !important; }
     .CUSTOM { background: transparent; color: #111827; border-color: transparent; }
     .picker { position: fixed; inset: 0; display: none; place-items: center; background: rgba(15,23,42,.16); z-index: 10; padding: 20px; }
     .picker.open { display: grid; }
@@ -143,10 +151,10 @@
       .tabs { width: 100%; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; }
       .tab { min-width: 0; padding: 8px 4px; font-size: 11px; white-space: nowrap; }
       .panel { border-radius: 14px; }
-      .mobile-controls-toggle { display: flex; }
-      .mobile-week-switch { display: grid; }
-      .mobile-top-toggle { display: inline-flex; }
-      .top-collapsed header, .top-collapsed nav, .top-collapsed > .notice { display: none; }
+      .mobile-controls-toggle { display: flex; margin: 6px 8px; width: calc(100% - 16px); padding: 8px 10px; }
+      .mobile-week-switch { display: grid; position: sticky; top: 0; z-index: 5; background: rgba(248,250,252,.96); border-bottom: 1px solid #cbd5e1; padding: 6px 8px; }
+      .mobile-week-switch .secondary { padding: 8px 6px; font-size: 11px; }
+      .mobile-top-toggle { display: inline-flex; margin: 0 0 2px; padding: 7px 9px; font-size: 12px; }
       .weekly-controls.collapsed { display: none; }
       .panel-head { gap: 8px; padding: 10px; }
       .toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
@@ -159,17 +167,18 @@
       .alerts-panel { padding: 7px 10px; }
       .alerts { grid-template-columns: 1fr; max-height: 150px; overflow: auto; -webkit-overflow-scrolling: touch; }
       .table-wrap { border-top: 1px solid #94a3b8; -webkit-overflow-scrolling: touch; }
-      table { min-width: 440px; }
-      .name-col { width: 76px; padding: 4px 4px; }
-      .date-col { width: 34px; }
-      .signature-col { width: 58px; }
-      tbody td { height: 32px; padding: 2px; }
-      .employee-name { white-space: normal; line-height: 1.1; font-size: 10px; }
+      table { min-width: 420px; }
+      .name-col { width: 70px; padding: 3px 4px; }
+      .date-col { width: 32px; }
+      .signature-col { width: 48px; }
+      tbody td { height: 30px; padding: 1px; }
+      .employee-name { white-space: normal; line-height: 1.05; font-size: 9.5px; }
       .employee-name span { display: block; }
-      .role, .date { font-size: 8px; line-height: 1.05; }
-      .dow { font-size: 10px; }
-      .holiday { font-size: 7px; }
-      .shift { font-size: 11px; border-radius: 5px; }
+      .role, .date { font-size: 7px; line-height: 1; }
+      .dow { font-size: 9px; }
+      .holiday { font-size: 6px; }
+      .shift { font-size: 10px; border-radius: 4px; }
+      tr.group-start td, tr.group-start .name-col { border-top-width: 4px !important; }
       .employee-form, .request-form { grid-template-columns: 1fr; }
       .employee-form { padding: 10px; }
       .employee-table { min-width: 520px; }
@@ -209,7 +218,7 @@
       html, body { width: 287mm; height: 200mm; overflow: hidden; }
       body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .app { padding: 0; min-height: auto; }
-      header, nav, .quickbar, .toolbar, .notice, .alerts, .picker { display: none !important; }
+      header, nav, .quickbar, .toolbar, .notice, .alerts, .alerts-panel, .picker, .mobile-controls-toggle, .mobile-week-switch, .mobile-top-toggle, .people-filter { display: none !important; }
       .shell, .panel { height: auto; min-height: 0; gap: 0; box-shadow: none; border: 0; }
       .panel { padding: 0; overflow: visible; }
       .table-wrap { overflow: visible; max-height: none; border: 0; }
@@ -225,6 +234,7 @@
       .holiday { margin-top: .5mm; padding: 0 .5mm; font-size: 4.5pt; line-height: 1.15; }
       .shift { font-size: 7pt; border-radius: 0; padding: 0; }
       .signature-line { height: 5mm; }
+      tr.group-start td, tr.group-start .name-col { border-top: 2mm solid #111827 !important; }
     }
     .shift.M, .shift.A, .shift.N, .shift.P, .shift.CUSTOM,
     .picker-grid .shift.M, .picker-grid .shift.A, .picker-grid .shift.N, .picker-grid .shift.P, .picker-grid .shift.CUSTOM {
@@ -233,10 +243,19 @@
       border-color: transparent !important;
       box-shadow: none !important;
     }
-    .shift.O, .shift.AL {
+    .shift.M, .picker-grid .shift.M {
+      color: #2563eb !important;
+    }
+    .shift.O {
       background: transparent !important;
       color: #dc2626 !important;
       border-color: transparent !important;
+      box-shadow: none !important;
+    }
+    .shift.AL {
+      background: #fef08a !important;
+      color: #dc2626 !important;
+      border-color: #facc15 !important;
       box-shadow: none !important;
     }
   </style>
@@ -361,6 +380,7 @@
       quick: null,
       alertsOpen: false,
       controlsOpen: false,
+      desktopControlsCollapsed: false,
       topCollapsed: false,
       cloudStatus: '',
       copyDaySource: null,
@@ -528,6 +548,22 @@
         return posDiff || employeeRank(a).localeCompare(employeeRank(b), 'zh-Hant');
       });
     }
+    function employeeGroup(emp) {
+      if (['manager', 'operations_lead', 'coach_lead', 'coach'].includes(emp.role)) return 'coach';
+      if (emp.role === 'frontdesk') return 'frontdesk';
+      return 'parttime';
+    }
+    function employeeGroupRank(group) {
+      return { coach: 0, frontdesk: 1, parttime: 2 }[group] ?? 9;
+    }
+    function sortScheduleEmployees(list) {
+      return [...list].sort((a, b) => {
+        const groupDiff = employeeGroupRank(employeeGroup(a)) - employeeGroupRank(employeeGroup(b));
+        if (groupDiff) return groupDiff;
+        const posDiff = (a.position ?? 9999) - (b.position ?? 9999);
+        return posDiff || employeeRank(a).localeCompare(employeeRank(b), 'zh-Hant');
+      });
+    }
     function roleMatches(emp, filter) {
       if (filter === 'all') return true;
       if (filter === 'coach') return ['manager', 'operations_lead', 'coach_lead', 'coach'].includes(emp.role);
@@ -562,8 +598,11 @@
       return s.work ? String(s.start) : s.short;
     }
     function shiftInlineStyle(shiftId) {
-      const red = ['O', 'AL'].includes(String(shiftId));
-      return `background:transparent!important;color:${red ? '#dc2626' : '#111827'}!important;border-color:transparent!important;box-shadow:none!important;`;
+      const id = String(shiftId);
+      if (id === 'AL') return 'background:#fef08a!important;color:#dc2626!important;border-color:#facc15!important;box-shadow:none!important;';
+      if (id === 'O') return 'background:transparent!important;color:#dc2626!important;border-color:transparent!important;box-shadow:none!important;';
+      if (id === 'M') return 'background:transparent!important;color:#2563eb!important;border-color:transparent!important;box-shadow:none!important;';
+      return 'background:transparent!important;color:#111827!important;border-color:transparent!important;box-shadow:none!important;';
     }
     function shiftCellHtml(shiftId, tag = 'div') {
       return `<${tag} class="shift ${shiftClass(shiftId)}" style="${shiftInlineStyle(shiftId)}">${escapeHtml(shiftCellLabel(shiftId))}</${tag}>`;
@@ -728,25 +767,28 @@
       const sum = summaries(days);
       const alerts = getAlerts(days, sum);
       const alertPreview = alerts[0] || '';
-      const employees = sortEmployees(state.employees.filter(employeeVisible));
-      const controlsCollapsed = mobile && !state.controlsOpen;
+      const employees = sortScheduleEmployees(state.employees.filter(employeeVisible));
+      const controlsCollapsed = mobile ? !state.controlsOpen : state.desktopControlsCollapsed;
       const stepLabel = scheduleStepDays() === 7 ? '週' : '四週';
       const filterOptions = `<option value="all">全部員工</option>${roles.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}`;
       const selectedPeople = Array.isArray(state.personFilter) ? state.personFilter : [];
-      const personChips = `<button class="person-chip ${selectedPeople.length ? '' : 'active'}" data-person-filter="all">全部人員</button>${sortEmployees(state.employees.filter(emp => roleMatches(emp, state.filter))).map(emp => `<button class="person-chip ${selectedPeople.includes(emp.id) ? 'active' : ''}" data-person-filter="${emp.id}">${escapeHtml(emp.name)}</button>`).join('')}`;
-      const rows = employees.map(emp => {
+      const personChips = `<button class="person-chip ${selectedPeople.length ? '' : 'active'}" data-person-filter="all">全部人員</button>${sortScheduleEmployees(state.employees.filter(emp => roleMatches(emp, state.filter))).map(emp => `<button class="person-chip ${selectedPeople.includes(emp.id) ? 'active' : ''}" data-person-filter="${emp.id}">${escapeHtml(emp.name)}</button>`).join('')}`;
+      const rows = employees.map((emp, index) => {
+        const group = employeeGroup(emp);
+        const previousGroup = index > 0 ? employeeGroup(employees[index - 1]) : group;
+        const groupClass = `group-${group}${index > 0 && group !== previousGroup ? ' group-start' : ''}`;
         const cells = days.map(day => {
           const id = state.schedule[day.key]?.[emp.id];
           const dayClass = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
           return `<td class="cell ${dayClass}" data-date="${day.key}" data-emp="${emp.id}">${id ? shiftCellHtml(id) : ''}</td>`;
         }).join('');
-        return `<tr><td class="name-col"><div class="employee-name">${employeeNameHtml(emp.name)}</div><div class="role">${roleLabel(emp.role)}</div></td>${cells}<td class="signature-col"><div class="signature-line"></div></td></tr>`;
+        return `<tr class="${groupClass}"><td class="name-col"><div class="employee-name">${employeeNameHtml(emp.name)}</div><div class="role">${roleLabel(emp.role)}</div></td>${cells}<td class="signature-col"><div class="signature-line"></div></td></tr>`;
       }).join('');
       const head = days.map(day => {
         const dayClass = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
         const copyClass = state.copyDaySource === day.key ? 'copy-source' : '';
         const copyTitle = state.view === 'admin' ? (state.copyDaySource ? `貼上到 ${day.key}` : `複製 ${day.key} 整天班表`) : '';
-        return `<th class="date-col ${dayClass} ${copyClass} ${state.view === 'admin' ? 'copy-date' : ''}" ${state.view === 'admin' ? `data-copy-date="${day.key}" title="${copyTitle}"` : ''}><div class="date">${day.key.slice(5).replace('-', '/')}</div><div class="dow">${day.dow}</div>${day.monday && !day.holiday ? '<div class="holiday" style="background:#a855f7">開會</div>' : ''}${day.holiday ? `<div class="holiday" title="${day.holiday}">${day.holiday}</div>` : ''}</th>`;
+        return `<th class="date-col ${dayClass} ${copyClass} ${state.view === 'admin' ? 'copy-date' : ''}" ${state.view === 'admin' ? `data-copy-date="${day.key}" title="${copyTitle}"` : ''}><div class="date">${day.key.slice(5).replace('-', '/')}</div><div class="dow">${day.dow}</div>${day.monday && !day.holiday ? '<div class="holiday meeting-label">開會</div>' : ''}${day.holiday ? `<div class="holiday" title="${day.holiday}">${day.holiday}</div>` : ''}</th>`;
       }).join('');
       layout(`
         <section class="panel">
@@ -956,20 +998,23 @@
     }
     function exportHtml() {
       const days = days28();
-      const employees = sortEmployees(state.employees.filter(employeeVisible));
+      const employees = sortScheduleEmployees(state.employees.filter(employeeVisible));
       const head = days.map(day => {
         const cls = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
         const meeting = day.monday && !day.holiday ? '<small class="meeting">開會</small>' : '';
         const holiday = day.holiday ? `<small class="holiday">${escapeHtml(day.holiday)}</small>` : '';
         return `<th class="${cls}"><div>${day.key.slice(5).replace('-', '/')}</div><div>${day.dow}</div>${meeting}${holiday}</th>`;
       }).join('');
-      const rows = employees.map(emp => {
+      const rows = employees.map((emp, index) => {
+        const group = employeeGroup(emp);
+        const previousGroup = index > 0 ? employeeGroup(employees[index - 1]) : group;
+        const groupClass = `group-${group}${index > 0 && group !== previousGroup ? ' group-start' : ''}`;
         const cells = days.map(day => {
           const id = state.schedule[day.key]?.[emp.id];
           const cls = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
           return `<td class="${cls}">${id ? shiftCellHtml(id, 'span') : ''}</td>`;
         }).join('');
-        return `<tr><td class="name"><b>${escapeHtml(emp.name)}</b><br><small>${roleLabel(emp.role)}</small></td>${cells}<td class="signature"></td></tr>`;
+        return `<tr class="${groupClass}"><td class="name"><b>${escapeHtml(emp.name)}</b><br><small>${roleLabel(emp.role)}</small></td>${cells}<td class="signature"></td></tr>`;
       }).join('');
       const html = `<!doctype html>
 <html lang="zh-Hant">
@@ -988,15 +1033,18 @@
     th { background: #f8fafc; }
     .name { width: 23mm; text-align: left; background: #fff; }
     .signature { width: 22mm; border-bottom: 1px dashed #64748b; }
-    .monday { background: #f3e8ff; }
+    .monday { background: #dbeafe; }
     .weekend { background: #fef3c7; }
     .holiday-cell { background: #fee2e2; }
     .meeting, .holiday { display: block; margin-top: .5mm; border-radius: 2px; color: white; padding: 0 .5mm; font-size: 4.5pt; }
-    .meeting { background: #a855f7; }
+    .meeting { background: #60a5fa; color: #0f172a; }
     .holiday { background: #ef4444; }
     .shift { display: inline-block; min-width: 5mm; border-radius: 0; border: 0; padding: 0; font-weight: 900; background: transparent !important; box-shadow: none !important; }
-    .M, .A, .N, .P, .CUSTOM { color: #111827; }
-    .O, .AL { color: #dc2626; }
+    .M { color: #2563eb; }
+    .A, .N, .P, .CUSTOM { color: #111827; }
+    .O { color: #dc2626; }
+    .AL { background: #fef08a !important; color: #dc2626; }
+    tr.group-start td, tr.group-start .name { border-top: 2mm solid #111827 !important; }
   </style>
 </head>
 <body>
@@ -1161,7 +1209,12 @@
         return;
       }
       if (action === 'cancelCopyDay') { state.copyDayMode = false; state.copyDaySource = null; render(); return; }
-      if (action === 'toggleControls') { state.controlsOpen = !state.controlsOpen; render(); return; }
+      if (action === 'toggleControls') {
+        if (isMobileView() || isLandscapeMobileView()) state.controlsOpen = !state.controlsOpen;
+        else state.desktopControlsCollapsed = !state.desktopControlsCollapsed;
+        render();
+        return;
+      }
       if (action === 'toggleAlerts') { state.alertsOpen = !state.alertsOpen; render(); return; }
       if (action === 'undo' && state.undo.length) { state.schedule = state.undo.shift(); save(); render(); }
       if (action === 'copyWeek') {
