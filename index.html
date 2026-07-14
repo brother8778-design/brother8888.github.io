@@ -57,6 +57,7 @@
     .top-collapsed header, .top-collapsed nav, .top-collapsed > .notice { display: none; }
     .cloud-pill { border: 1px solid #bfdbfe; border-radius: 999px; background: #eff6ff; color: #1d4ed8; padding: 6px 10px; font-size: 12px; font-weight: 950; }
     .weekly-controls { display: contents; }
+    .weekly-controls.collapsed { display: none; }
     .quickbar { border-bottom: 1px solid #c7d2fe; background: #eef2ff; padding: 8px 12px; overflow-x: auto; }
     .quickbar span { color: #3730a3; font-size: 12px; font-weight: 950; white-space: nowrap; }
     .chip { border: 1px solid var(--line); border-radius: 10px; background: white; color: #475569; padding: 7px 10px; font-size: 12px; font-weight: 900; white-space: nowrap; }
@@ -112,6 +113,9 @@
     .picker-close { float: right; border-radius: 999px; background: #f1f5f9; color: #475569; width: 28px; height: 28px; font-weight: 950; }
     .custom-shift { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
     .custom-shift input { min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 9px; font-weight: 900; }
+    .cell-color-tools { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: end; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .cell-color-tools label { display: grid; gap: 5px; color: #475569; font-size: 12px; font-weight: 950; }
+    .cell-color-tools input[type="color"] { width: 100%; min-width: 64px; height: 38px; border: 1px solid var(--line); border-radius: 8px; background: white; padding: 3px; cursor: pointer; }
     .employee-form { display: grid; grid-template-columns: 1fr 190px auto; gap: 10px; padding: 14px; border-bottom: 1px solid var(--line); background: #f8fafc; }
     .employee-form input, .employee-form select, .request-form input, .request-form select, .request-form textarea, .toolbar select { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 11px; font-weight: 850; outline: none; }
     .employee-table th, .employee-table td { padding: 10px 12px; text-align: left; height: auto; }
@@ -178,6 +182,8 @@
       .dow { font-size: 9px; }
       .holiday { font-size: 6px; }
       .shift { font-size: 10px; border-radius: 4px; }
+      .cell-color-tools { grid-template-columns: 1fr 1fr; }
+      .cell-color-tools label { grid-column: 1 / -1; }
       tr.group-start td, tr.group-start .name-col { border-top-width: 4px !important; }
       .employee-form, .request-form { grid-template-columns: 1fr; }
       .employee-form { padding: 10px; }
@@ -218,7 +224,7 @@
       html, body { width: 287mm; height: 200mm; overflow: hidden; }
       body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .app { padding: 0; min-height: auto; }
-      header, nav, .quickbar, .toolbar, .notice, .alerts, .alerts-panel, .picker, .mobile-controls-toggle, .mobile-week-switch, .mobile-top-toggle, .people-filter { display: none !important; }
+      header, nav, .panel-head, .quickbar, .toolbar, .notice, .alerts, .alerts-panel, .picker, .mobile-controls-toggle, .mobile-week-switch, .mobile-top-toggle, .people-filter { display: none !important; }
       .shell, .panel { height: auto; min-height: 0; gap: 0; box-shadow: none; border: 0; }
       .panel { padding: 0; overflow: visible; }
       .table-wrap { overflow: visible; max-height: none; border: 0; }
@@ -389,6 +395,7 @@
       requestSelectedDates: [],
       employees: cloneData(defaults),
       schedule: {},
+      cellColors: {},
       requests: [],
       undo: [],
       filter: 'all',
@@ -407,6 +414,7 @@
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
         if (Array.isArray(saved.employees)) state.employees = saved.employees;
         if (saved.schedule) state.schedule = saved.schedule;
+        if (saved.cellColors && typeof saved.cellColors === 'object') state.cellColors = saved.cellColors;
         if (Array.isArray(saved.requests)) state.requests = saved.requests;
         syncOfficialEmployees();
       } catch { localStorage.removeItem(STORAGE_KEY); }
@@ -420,7 +428,7 @@
       save();
     }
     function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ employees: state.employees, schedule: state.schedule, requests: state.requests }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ employees: state.employees, schedule: state.schedule, cellColors: state.cellColors, requests: state.requests }));
     }
     async function uploadScheduleCloud() {
       if (!window.saveScheduleToCloud) {
@@ -433,6 +441,7 @@
         await window.saveScheduleToCloud({
           employees: state.employees,
           schedule: state.schedule,
+          cellColors: state.cellColors,
           requests: state.requests,
           source: 'fitness-schedule'
         });
@@ -458,6 +467,7 @@
         }
         if (Array.isArray(data.employees)) state.employees = data.employees;
         if (data.schedule && typeof data.schedule === 'object') state.schedule = data.schedule;
+        state.cellColors = data.cellColors && typeof data.cellColors === 'object' ? data.cellColors : {};
         if (Array.isArray(data.requests)) state.requests = data.requests;
         normalizeEmployeeOrder();
         save();
@@ -655,6 +665,28 @@
       pushSchedule(next);
       render();
     }
+    function safeColor(value) {
+      const color = String(value || '').trim();
+      return /^#[0-9a-fA-F]{6}$/.test(color) ? color.toLowerCase() : '';
+    }
+    function cellColor(date, empId) {
+      return safeColor(state.cellColors?.[date]?.[empId]);
+    }
+    function cellStyle(date, empId) {
+      const color = cellColor(date, empId);
+      return color ? ` style="background:${color}!important"` : '';
+    }
+    function setCellColor(date, empId, color) {
+      const next = cloneData(state.cellColors || {});
+      const normalized = safeColor(color);
+      next[date] ||= {};
+      if (normalized) next[date][empId] = normalized;
+      else delete next[date][empId];
+      if (!Object.keys(next[date]).length) delete next[date];
+      state.cellColors = next;
+      save();
+      render();
+    }
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
     }
@@ -772,6 +804,7 @@
       const stepLabel = scheduleStepDays() === 7 ? '週' : '四週';
       const filterOptions = `<option value="all">全部員工</option>${roles.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}`;
       const selectedPeople = Array.isArray(state.personFilter) ? state.personFilter : [];
+      const selectedColor = state.selected ? cellColor(state.selected.date, state.selected.emp) : '';
       const personChips = `<button class="person-chip ${selectedPeople.length ? '' : 'active'}" data-person-filter="all">全部人員</button>${sortScheduleEmployees(state.employees.filter(emp => roleMatches(emp, state.filter))).map(emp => `<button class="person-chip ${selectedPeople.includes(emp.id) ? 'active' : ''}" data-person-filter="${emp.id}">${escapeHtml(emp.name)}</button>`).join('')}`;
       const rows = employees.map((emp, index) => {
         const group = employeeGroup(emp);
@@ -780,7 +813,7 @@
         const cells = days.map(day => {
           const id = state.schedule[day.key]?.[emp.id];
           const dayClass = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
-          return `<td class="cell ${dayClass}" data-date="${day.key}" data-emp="${emp.id}">${id ? shiftCellHtml(id) : ''}</td>`;
+          return `<td class="cell ${dayClass}"${cellStyle(day.key, emp.id)} data-date="${day.key}" data-emp="${emp.id}">${id ? shiftCellHtml(id) : ''}</td>`;
         }).join('');
         return `<tr class="${groupClass}"><td class="name-col"><div class="employee-name">${employeeNameHtml(emp.name)}</div><div class="role">${roleLabel(emp.role)}</div></td>${cells}<td class="signature-col"><div class="signature-line"></div></td></tr>`;
       }).join('');
@@ -833,6 +866,11 @@
             <input id="customStart" type="number" min="0" max="23" value="10" aria-label="開始時間" />
             <input id="customEnd" type="number" min="1" max="24" value="18" aria-label="結束時間" />
             <button class="primary" data-action="saveCustomShift">自訂</button>
+          </div>
+          <div class="cell-color-tools">
+            <label>格子底色<input id="cellColorInput" type="color" value="${selectedColor || '#fef08a'}" /></label>
+            <button class="secondary" data-action="applyCellColor">套用顏色</button>
+            <button class="secondary" data-action="clearCellColor">清除顏色</button>
           </div>
           <button class="danger" style="width:100%; margin-top:10px" data-pick="">清除班別</button>
         </div></div>`);
@@ -967,6 +1005,7 @@
         exportedAt: new Date().toISOString(),
         employees: state.employees,
         schedule: state.schedule,
+        cellColors: state.cellColors,
         requests: state.requests
       };
       downloadFile(`fitness-schedule-data-${formatDate(new Date())}.json`, JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
@@ -984,6 +1023,7 @@
           }
           state.employees = payload.employees;
           state.schedule = payload.schedule || {};
+          state.cellColors = payload.cellColors && typeof payload.cellColors === 'object' ? payload.cellColors : {};
           state.requests = Array.isArray(payload.requests) ? payload.requests : [];
           state.undo = [];
           normalizeEmployeeOrder();
@@ -1012,7 +1052,7 @@
         const cells = days.map(day => {
           const id = state.schedule[day.key]?.[emp.id];
           const cls = day.holiday ? 'holiday-cell' : day.monday ? 'monday' : day.weekend ? 'weekend' : '';
-          return `<td class="${cls}">${id ? shiftCellHtml(id, 'span') : ''}</td>`;
+          return `<td class="${cls}"${cellStyle(day.key, emp.id)}>${id ? shiftCellHtml(id, 'span') : ''}</td>`;
         }).join('');
         return `<tr class="${groupClass}"><td class="name"><b>${escapeHtml(emp.name)}</b><br><small>${roleLabel(emp.role)}</small></td>${cells}<td class="signature"></td></tr>`;
       }).join('');
@@ -1163,6 +1203,12 @@
         const next = cloneData(state.schedule);
         Object.keys(next).forEach(date => { delete next[date][id]; if (!Object.keys(next[date]).length) delete next[date]; });
         state.schedule = next;
+        const nextColors = cloneData(state.cellColors || {});
+        Object.keys(nextColors).forEach(date => {
+          delete nextColors[date][id];
+          if (!Object.keys(nextColors[date]).length) delete nextColors[date];
+        });
+        state.cellColors = nextColors;
         normalizeEmployeeOrder();
         save();
         render();
@@ -1177,6 +1223,14 @@
       const action = target.dataset.action;
       if (action === 'logout') { state.view = 'login'; state.tab = 'weekly'; state.quick = null; state.editingEmployee = null; render(); }
       if (action === 'closePicker') { state.selected = null; render(); return; }
+      if (action === 'applyCellColor' && state.selected) {
+        setCellColor(state.selected.date, state.selected.emp, document.getElementById('cellColorInput')?.value);
+        return;
+      }
+      if (action === 'clearCellColor' && state.selected) {
+        setCellColor(state.selected.date, state.selected.emp, '');
+        return;
+      }
       if (action === 'saveCustomShift' && state.selected) {
         const start = Number(document.getElementById('customStart')?.value);
         const end = Number(document.getElementById('customEnd')?.value);
