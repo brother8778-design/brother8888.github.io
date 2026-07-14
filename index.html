@@ -378,10 +378,11 @@
       if (typeof structuredClone === 'function') return structuredClone(value);
       return JSON.parse(JSON.stringify(value));
     };
+    const SCHEDULE_START = new Date(2026, 6, 6);
     const state = {
       view: 'login',
       tab: 'weekly',
-      baseDate: new Date(),
+      baseDate: new Date(SCHEDULE_START),
       timelineDate: new Date(),
       quick: null,
       alertsOpen: false,
@@ -1245,7 +1246,7 @@
       }
       if (action === 'prev4') { state.baseDate.setDate(state.baseDate.getDate() - scheduleStepDays()); render(); }
       if (action === 'next4') { state.baseDate.setDate(state.baseDate.getDate() + scheduleStepDays()); render(); }
-      if (action === 'todayRange') { state.baseDate = new Date(); render(); }
+      if (action === 'todayRange') { state.baseDate = new Date(SCHEDULE_START); render(); }
       if (action === 'prevDay') { state.timelineDate.setDate(state.timelineDate.getDate() - 1); render(); }
       if (action === 'nextDay') { state.timelineDate.setDate(state.timelineDate.getDate() + 1); render(); }
       if (action === 'print') { printSchedule(); return; }
