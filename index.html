@@ -180,19 +180,36 @@
     .chart-box canvas { width: 100% !important; height: 260px !important; }
     .fallback-chart { height: 230px; display: flex; align-items: end; gap: 6px; padding: 12px 4px 24px; border-bottom: 1px solid #cbd5e1; }
     .fallback-bar { flex: 1; min-width: 12px; position: relative; border-radius: 4px 4px 0 0; background: #4f46e5; }
+    .fallback-bar strong { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); border: 1px solid #c7d2fe; border-radius: 4px; background: white; color: #312e81; padding: 2px 4px; font-size: 8px; font-weight: 900; white-space: nowrap; }
     .fallback-bar span { position: absolute; left: 50%; bottom: -21px; transform: translateX(-50%); color: #64748b; font-size: 8px; font-weight: 900; white-space: nowrap; }
     .trend-values { display: grid; grid-template-columns: repeat(13, minmax(56px, 1fr)); gap: 5px; margin-top: 10px; overflow-x: auto; }
     .trend-point { border: 1px solid #dbe3ed; border-radius: 6px; background: #f8fafc; padding: 6px; text-align: center; }
     .trend-point span { display: block; color: #64748b; font-size: 9px; font-weight: 900; }
     .trend-point strong { display: block; margin-top: 2px; font-size: 10px; font-variant-numeric: tabular-nums; }
-    .coach-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .coach-toolbar select { border: 1px solid var(--line); border-radius: 9px; background: white; padding: 8px 10px; font-weight: 900; }
+    .coach-toolbar { display: grid; gap: 10px; }
+    .coach-toolbar-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+    .coach-toolbar-head strong { display: block; font-size: 16px; }
+    .coach-button-list { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 5px; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+    .coach-switch { flex: 0 0 auto; border: 1px solid #cbd5e1; border-radius: 8px; background: white; color: #475569; padding: 8px 11px; font-size: 11px; font-weight: 900; white-space: nowrap; }
+    .coach-switch:hover { border-color: #818cf8; color: #3730a3; }
+    .coach-switch.active { border-color: #4f46e5; background: #4f46e5; color: white; box-shadow: 0 5px 12px rgba(79,70,229,.18); }
+    .coach-mobile-select { display: none; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: white; padding: 10px; font-weight: 900; }
+    .coach-workspace { display: grid; gap: 12px; }
+    .coach-workspace-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 12px; border-left: 4px solid #4f46e5; background: #eef2ff; }
+    .coach-workspace-title h3 { margin: 0; font-size: 16px; }
+    .coach-workspace-title span { color: #6366f1; font-size: 10px; font-weight: 900; }
     .coach-performance-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .coach-performance-card { min-width: 0; }
-    .coach-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 10px 0; }
-    .coach-stat { border-left: 3px solid #4f46e5; background: #f8fafc; padding: 7px 8px; }
-    .coach-stat span { display: block; color: #64748b; font-size: 9px; font-weight: 900; }
-    .coach-stat strong { display: block; margin-top: 2px; font-size: 13px; font-variant-numeric: tabular-nums; }
+    .coach-metric-card { min-width: 0; border-top: 3px solid var(--metric-color, #4f46e5); background: var(--metric-soft, #eef2ff); }
+    .coach-metric-card .fallback-bar { background: var(--metric-color, #4f46e5); }
+    .coach-metric-card[data-coach-metric="revenue"] { --metric-color: #4f46e5; --metric-soft: #eef2ff; }
+    .coach-metric-card[data-coach-metric="sessions"] { --metric-color: #0f766e; --metric-soft: #ecfdf5; }
+    .coach-metric-card[data-coach-metric="attendance"] { --metric-color: #b45309; --metric-soft: #fffbeb; }
+    .coach-metric-card[data-coach-metric="trialClasses"] { --metric-color: #be123c; --metric-soft: #fff1f2; }
+    .coach-chart-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+    .coach-chart-heading h3 { margin: 0; font-size: 13px; }
+    .coach-chart-heading span { color: #64748b; font-size: 9px; font-weight: 850; }
+    .coach-chart-box { min-height: 250px; }
+    .coach-empty-state { border: 1px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; padding: 32px 16px; color: #64748b; text-align: center; font-weight: 900; }
     .finance-form { display: grid; gap: 12px; }
     .finance-form-section { border: 1px solid #d7e0ea; border-radius: 8px; background: white; padding: 12px; }
     .finance-form-section h3 { margin: 0 0 10px; font-size: 14px; }
@@ -307,10 +324,12 @@
       .finance-card { padding: 10px; }
       .finance-table { min-width: 560px; }
       .chart-box, .chart-box canvas { min-height: 230px; height: 230px !important; }
-      .coach-toolbar { align-items: stretch; flex-direction: column; }
-      .coach-toolbar select { width: 100%; }
+      .coach-toolbar-head { align-items: stretch; flex-direction: column; }
+      .coach-button-list { display: none; }
+      .coach-mobile-select { display: block; }
       .coach-performance-grid { grid-template-columns: 1fr; }
-      .coach-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .coach-workspace-title { align-items: flex-start; flex-direction: column; }
+      .coach-chart-box { min-height: 220px; }
       .finance-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .finance-coach-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .finance-coach-name { grid-column: 1 / -1; }
@@ -1439,24 +1458,25 @@
       const periods = financePeriods().filter(period => period >= '2025-06' && period <= '2026-06');
       return `<article class="finance-card"><h3>近 13 個月教練課營收變動趨勢</h3><p class="finance-card-note">2025 年 6 月至 2026 年 6 月</p><div class="chart-box"><canvas id="financeTrendChart"></canvas></div><div class="trend-values">${periods.map(period => `<div class="trend-point" data-trend-point="${period}"><span>${period.slice(2).replace('-', '/')}</span><strong>${financeFormat(state.financeMonths[period]?.store?.coaching?.totalRevenue, true)}</strong></div>`).join('')}</div></article>`;
     }
-    function coachLatestStats(coachId, preferredPeriod) {
-      const preferred = state.financeMonths[preferredPeriod]?.coaches?.[coachId];
-      if (preferred) return { period: preferredPeriod, ...preferred };
-      const period = [...financePeriods()].reverse().find(key => state.financeMonths[key]?.coaches?.[coachId]);
-      return { period: period || preferredPeriod, ...(state.financeMonths[period]?.coaches?.[coachId] || {}) };
+    function coachPerformancePeriods(coachId) {
+      return financePeriods().filter(period => state.financeMonths[period]?.coaches?.[coachId]).slice(-6);
     }
     function renderFinanceCoaches() {
       const directory = financeCoachDirectory();
+      if (!directory.length) return '<div class="coach-empty-state">目前沒有可顯示的教練</div>';
       if (!directory.some(coach => coach.id === state.financeCoachId)) state.financeCoachId = directory[0]?.id || '';
-      const mobile = isMobileView() || isLandscapeMobileView();
-      const shown = mobile ? directory.filter(coach => coach.id === state.financeCoachId) : directory;
-      return `<div class="coach-toolbar"><div><strong>教練績效</strong><div class="finance-card-note" style="margin:3px 0 0">業績、操課、學員人數與體驗課</div></div><select data-action="financeCoachSelect">${directory.map(coach => `<option value="${escapeHtml(coach.id)}" ${coach.id === state.financeCoachId ? 'selected' : ''}>${escapeHtml(coach.name)}</option>`).join('')}</select></div>
-        <div class="coach-performance-grid">${shown.map(coach => {
-          const stats = coachLatestStats(coach.id, state.financeSelectedPeriod);
-          return `<article class="finance-card coach-performance-card" data-coach-id="${escapeHtml(coach.id)}"><h3>${escapeHtml(coach.name)}</h3><p class="finance-card-note">${escapeHtml(stats.period || state.financeSelectedPeriod)} 績效</p><div class="coach-stats">
-            <div class="coach-stat"><span>總業績</span><strong>${financeFormat(stats.revenue, true)}</strong></div><div class="coach-stat"><span>總操課</span><strong>${financeFormat(stats.sessions)}</strong></div><div class="coach-stat"><span>學員人數</span><strong>${financeFormat(stats.attendance)}</strong></div><div class="coach-stat"><span>體驗課</span><strong>${financeFormat(stats.trialClasses)}</strong></div>
-          </div><div class="chart-box"><canvas data-coach-chart="${escapeHtml(coach.id)}"></canvas></div></article>`;
-        }).join('')}</div>`;
+      const coach = directory.find(item => item.id === state.financeCoachId);
+      const periods = coachPerformancePeriods(coach.id);
+      const options = directory.map(item => `<option value="${escapeHtml(item.id)}" ${item.id === coach.id ? 'selected' : ''}>${escapeHtml(item.name)}</option>`).join('');
+      const buttons = directory.map(item => `<button class="coach-switch ${item.id === coach.id ? 'active' : ''}" data-finance-coach-button="${escapeHtml(item.id)}" aria-pressed="${item.id === coach.id ? 'true' : 'false'}">${escapeHtml(item.name)}</button>`).join('');
+      const charts = periods.length ? `<div class="coach-performance-grid">
+        <article class="finance-card coach-metric-card" data-coach-metric="revenue"><div class="coach-chart-heading"><h3>業績</h3><span>最近六個月</span></div><div class="chart-box coach-chart-box"><canvas data-coach-chart="revenue"></canvas></div></article>
+        <article class="finance-card coach-metric-card" data-coach-metric="sessions"><div class="coach-chart-heading"><h3>操課堂數</h3><span>最近六個月</span></div><div class="chart-box coach-chart-box"><canvas data-coach-chart="sessions"></canvas></div></article>
+        <article class="finance-card coach-metric-card" data-coach-metric="attendance"><div class="coach-chart-heading"><h3>實到學生數</h3><span>最近六個月</span></div><div class="chart-box coach-chart-box"><canvas data-coach-chart="attendance"></canvas></div></article>
+        <article class="finance-card coach-metric-card" data-coach-metric="trialClasses"><div class="coach-chart-heading"><h3>體驗課人數</h3><span>最近六個月</span></div><div class="chart-box coach-chart-box"><canvas data-coach-chart="trialClasses"></canvas></div></article>
+      </div>` : '<div class="coach-empty-state">這位教練目前沒有績效資料</div>';
+      return `<div class="coach-toolbar"><div class="coach-toolbar-head"><div><strong>教練績效</strong><div class="finance-card-note" style="margin:3px 0 0">點選教練查看個人趨勢</div></div><select class="coach-mobile-select" data-action="financeCoachSelect" aria-label="選擇教練">${options}</select></div><div class="coach-button-list" aria-label="教練名單">${buttons}</div></div>
+        <section class="coach-workspace" data-coach-id="${escapeHtml(coach.id)}"><div class="coach-workspace-title"><h3 data-active-coach-name>${escapeHtml(coach.name)}</h3><span>${periods.length ? `${periods[0]} 至 ${periods[periods.length - 1]}` : '尚無資料'}</span></div>${charts}</section>`;
     }
     function financeFieldHtml(path, label, record) {
       return `<label class="finance-field">${label}<input type="number" min="0" step="1" value="${financeNumber(financeGet(record, path))}" data-finance-field="${path}" /></label>`;
@@ -1557,19 +1577,59 @@
       state.financeCharts.forEach(chart => { try { chart.destroy(); } catch {} });
       state.financeCharts = [];
     }
-    function financeFallbackChart(canvas, labels, values) {
+    function financeFallbackChart(canvas, labels, values, formatter = null) {
       if (!canvas) return;
       canvas.style.display = 'none';
       const max = Math.max(...values.map(financeNumber), 1);
       const fallback = document.createElement('div');
       fallback.className = 'fallback-chart';
-      fallback.innerHTML = values.map((value, index) => `<div class="fallback-bar" style="height:${Math.max(3, financeNumber(value) / max * 100)}%" title="${financeFormat(value)}"><span>${escapeHtml(labels[index] || '')}</span></div>`).join('');
+      fallback.innerHTML = values.map((value, index) => {
+        const displayValue = formatter ? formatter(value) : financeFormat(value);
+        return `<div class="fallback-bar" style="height:${Math.max(3, financeNumber(value) / max * 100)}%" title="${escapeHtml(displayValue)}">${formatter ? `<strong>${escapeHtml(displayValue)}</strong>` : ''}<span>${escapeHtml(labels[index] || '')}</span></div>`;
+      }).join('');
       canvas.parentElement.appendChild(fallback);
     }
-    function createFinanceChart(canvas, config, fallbackLabels, fallbackValues) {
+    function createFinanceChart(canvas, config, fallbackLabels, fallbackValues, fallbackFormatter) {
       if (!canvas) return;
-      if (!window.Chart) return financeFallbackChart(canvas, fallbackLabels, fallbackValues);
+      if (!window.Chart) return financeFallbackChart(canvas, fallbackLabels, fallbackValues, fallbackFormatter);
       state.financeCharts.push(new window.Chart(canvas, config));
+    }
+    const coachPointLabelsPlugin = {
+      id: 'coachPointLabels',
+      afterDatasetsDraw(chart, args, options) {
+        const meta = chart.getDatasetMeta(0);
+        if (!meta || meta.hidden) return;
+        const { ctx, chartArea } = chart;
+        const formatter = typeof options.formatter === 'function' ? options.formatter : financeFormat;
+        meta.data.forEach((point, index) => {
+          const label = formatter(chart.data.datasets[0].data[index]);
+          ctx.save();
+          ctx.font = '800 10px system-ui, sans-serif';
+          const width = ctx.measureText(label).width + 10;
+          const height = 20;
+          const x = Math.max(chartArea.left, Math.min(point.x - width / 2, chartArea.right - width));
+          const y = Math.max(chartArea.top + 2, point.y - 27);
+          ctx.fillStyle = 'rgba(255,255,255,.96)';
+          ctx.strokeStyle = options.borderColor || '#c7d2fe';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          if (typeof ctx.roundRect === 'function') ctx.roundRect(x, y, width, height, 4);
+          else ctx.rect(x, y, width, height);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = options.color || '#312e81';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(label, x + width / 2, y + height / 2);
+          ctx.restore();
+        });
+      }
+    };
+    function coachMetricFormat(metric, value) {
+      const number = financeNumber(value).toLocaleString('zh-TW');
+      if (metric === 'revenue') return `$${number}`;
+      if (metric === 'sessions') return `${number}堂`;
+      return `${number}人`;
     }
     function renderFinanceCharts() {
       clearFinanceCharts();
@@ -1594,17 +1654,40 @@
         createFinanceChart(document.getElementById('financeTrendChart'), { type: 'bar', data: { labels: trendLabels, datasets: [{ label: '教練課總業績', data: values, backgroundColor: '#6366f1', borderRadius: 4 }] }, options: baseOptions }, trendLabels, values);
       }
       if (state.financeSection === 'coaches') {
+        const coachId = state.financeCoachId;
+        const coachPeriods = coachPerformancePeriods(coachId);
+        const coachLabels = coachPeriods.map(period => `${Number(period.slice(5))}月`);
+        const metricStyles = {
+          revenue: { color: '#4f46e5', fill: 'rgba(79,70,229,.12)' },
+          sessions: { color: '#0f766e', fill: 'rgba(15,118,110,.12)' },
+          attendance: { color: '#b45309', fill: 'rgba(180,83,9,.12)' },
+          trialClasses: { color: '#be123c', fill: 'rgba(190,18,60,.10)' }
+        };
         document.querySelectorAll('[data-coach-chart]').forEach(canvas => {
-          const coachId = canvas.dataset.coachChart;
-          const coachPeriods = periods.filter(period => state.financeMonths[period]?.coaches?.[coachId]);
-          const coachLabels = coachPeriods.map(period => period.slice(2).replace('-', '/'));
-          const revenue = coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId].revenue));
-          createFinanceChart(canvas, { type: 'bar', data: { labels: coachLabels, datasets: [
-            { label: '總業績', data: revenue, backgroundColor: '#4f46e5', yAxisID: 'y' },
-            { type: 'line', label: '總操課', data: coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId].sessions)), borderColor: '#0f766e', yAxisID: 'y1', tension: .2 },
-            { type: 'line', label: '學員人數', data: coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId].attendance)), borderColor: '#d97706', yAxisID: 'y1', tension: .2 },
-            { type: 'line', label: '體驗課', data: coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId].trialClasses)), borderColor: '#dc2626', yAxisID: 'y1', tension: .2 }
-          ] }, options: { ...baseOptions, scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } } } } }, coachLabels, revenue);
+          const metric = canvas.dataset.coachChart;
+          const style = metricStyles[metric] || metricStyles.revenue;
+          const values = coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId][metric]));
+          const formatter = value => coachMetricFormat(metric, value);
+          createFinanceChart(canvas, {
+            type: 'line',
+            plugins: [coachPointLabelsPlugin],
+            data: { labels: coachLabels, datasets: [{ data: values, borderColor: style.color, backgroundColor: style.fill, borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: 'white', pointBorderColor: style.color, pointBorderWidth: 2.5, tension: .3, fill: true }] },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: { intersect: false, mode: 'index' },
+              layout: { padding: { top: 30, right: 12, left: 4 } },
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: context => formatter(context.raw) } },
+                coachPointLabels: { formatter, color: style.color, borderColor: style.color }
+              },
+              scales: {
+                x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10, weight: '700' } } },
+                y: { beginAtZero: true, grace: '25%', grid: { color: 'rgba(148,163,184,.16)' }, ticks: { color: '#94a3b8', font: { size: 9 }, callback: value => financeNumber(value).toLocaleString('zh-TW') } }
+              }
+            }
+          }, coachLabels, values, formatter);
         });
       }
     }
@@ -2214,7 +2297,7 @@
         render();
         return;
       }
-      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-copy-date],[data-pick],[data-delete],[data-edit],[data-move],[data-person-filter],[data-request-delete],[data-request-date],[data-finance-section]');
+      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-copy-date],[data-pick],[data-delete],[data-edit],[data-move],[data-person-filter],[data-request-delete],[data-request-date],[data-finance-section],[data-finance-coach-button]');
       if (!target) {
         if (state.selected && event.target.closest('#picker .picker-card')) return;
         if (state.selected) { state.selected = null; render(); }
@@ -2231,6 +2314,11 @@
         state.financeSection = target.dataset.financeSection;
         state.financeStatus = '';
         state.financeError = '';
+        render();
+        return;
+      }
+      if (target.dataset.financeCoachButton) {
+        state.financeCoachId = target.dataset.financeCoachButton;
         render();
         return;
       }
