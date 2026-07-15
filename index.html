@@ -216,6 +216,10 @@
     .owner-setup summary { cursor: pointer; padding: 12px 14px; color: #3730a3; text-align: center; font-size: 13px; font-weight: 950; }
     .owner-setup form { padding: 0 12px 12px; }
     .verification-box { display: grid; gap: 9px; margin-top: 12px; border: 1px solid #86efac; border-radius: 12px; background: #f0fdf4; padding: 12px; color: #166534; text-align: center; font-size: 12px; font-weight: 900; line-height: 1.6; }
+    .verification-details { border-radius: 9px; background: rgba(255,255,255,.72); padding: 9px; color: #475569; font-size: 11px; line-height: 1.7; }
+    .verification-details strong { color: #0f172a; }
+    .verification-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .verification-actions .primary { grid-column: 1 / -1; }
     .manager-account-form { display: grid; grid-template-columns: 1fr 1.2fr 1fr auto; gap: 9px; align-items: end; }
     .manager-account-list { display: grid; gap: 8px; }
     .manager-account-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(210px, 1.2fr) auto auto; gap: 10px; align-items: center; border-bottom: 1px solid #e2e8f0; padding: 10px 0; }
@@ -406,6 +410,8 @@
     };
 
     const OWNER_EMAIL = 'ed56671056@gmail.com';
+    const PUBLIC_APP_URL = 'https://brother8778-design.github.io/brother8888.github.io/';
+    const EMAIL_ACTION_SETTINGS = { url: PUBLIC_APP_URL, handleCodeInApp: false };
     const firebaseApp = initializeApp(firebaseConfig);
     const provisioningApp = initializeApp(firebaseConfig, 'igym-admin-provisioning');
     const firestoreDb = getFirestore(firebaseApp);
@@ -471,6 +477,7 @@
     window.firestoreDb = firestoreDb;
     window.firebaseAuth = firebaseAuth;
     window.OWNER_EMAIL = OWNER_EMAIL;
+    window.PUBLIC_APP_URL = PUBLIC_APP_URL;
     window.bootstrapOwnerAccount = async function bootstrapOwnerAccount(displayName, password) {
       let user;
       try {
@@ -483,7 +490,7 @@
       }
       await reload(user);
       if (!user.emailVerified) {
-        await sendEmailVerification(user, { url: location.href.split('#')[0] });
+        await sendEmailVerification(user, EMAIL_ACTION_SETTINGS);
         return { pendingVerification: true, email: OWNER_EMAIL };
       }
       await ensureOwnerAdmin(user, displayName);
@@ -497,8 +504,21 @@
       await ensureOwnerAdmin(user);
       return verifyManager(user);
     };
+    window.resendOwnerVerification = async function resendOwnerVerification() {
+      const user = firebaseAuth.currentUser;
+      if (!user) throw new Error('請先用原本的主管 Email 與密碼登入');
+      await reload(user);
+      if (user.emailVerified) {
+        await ensureOwnerAdmin(user);
+        return verifyManager(user);
+      }
+      await sendEmailVerification(user, EMAIL_ACTION_SETTINGS);
+      return { pendingVerification: true, email: user.email || OWNER_EMAIL };
+    };
     window.signInFinanceManager = async function signInFinanceManager(email, password) {
       const credential = await signInWithEmailAndPassword(firebaseAuth, email, password);
+      await reload(credential.user);
+      if (!credential.user.emailVerified) return { pendingVerification: true, email: credential.user.email || email };
       try {
         return await verifyManager(credential.user);
       } catch (error) {
@@ -528,7 +548,7 @@
       try {
         const credential = await createUserWithEmailAndPassword(provisioningAuth, normalizedEmail, password);
         newUser = credential.user;
-        await sendEmailVerification(newUser, { url: location.href.split('#')[0] });
+        await sendEmailVerification(newUser, EMAIL_ACTION_SETTINGS);
         await setDoc(doc(firestoreDb, 'admins', newUser.uid), {
           email: normalizedEmail,
           displayName: normalizedName,
@@ -548,7 +568,7 @@
       const owner = await requireOwner();
       const credential = await signInWithEmailAndPassword(provisioningAuth, String(email || '').trim(), password);
       try {
-        await sendEmailVerification(credential.user, { url: location.href.split('#')[0] });
+        await sendEmailVerification(credential.user, EMAIL_ACTION_SETTINGS);
         await setDoc(doc(firestoreDb, 'admins', credential.user.uid), {
           verificationSentAt: serverTimestamp(),
           updatedBy: owner.uid,
@@ -570,7 +590,7 @@
     };
     window.sendManagerPasswordReset = async function sendManagerPasswordReset(email) {
       await requireOwner();
-      await sendPasswordResetEmail(firebaseAuth, String(email || '').trim(), { url: location.href.split('#')[0] });
+      await sendPasswordResetEmail(firebaseAuth, String(email || '').trim(), EMAIL_ACTION_SETTINGS);
       return true;
     };
     window.loadFinanceMonthsFromCloud = async function loadFinanceMonthsFromCloud() {
@@ -823,6 +843,7 @@
       managerUser: null,
       ownerVerificationPending: false,
       ownerVerificationEmail: '',
+      ownerVerificationResendAt: 0,
       financeSection: 'overview',
       financeSelectedPeriod: '2026-06',
       financeCoachId: 'coach-wally',
@@ -839,6 +860,32 @@
       managerAccountsError: '',
       managerVerificationTarget: null
     };
+
+    function firebaseAuthErrorMessage(error, fallback = 'Firebase 操作失敗，請稍後再試') {
+      const code = String(error?.code || '');
+      const messages = {
+        'auth/unauthorized-continue-uri': '驗證連結回傳網址未授權，請改用 IGYM 公開網站後再試',
+        'auth/too-many-requests': '驗證信寄送太頻繁，請等待一分鐘後再試',
+        'auth/network-request-failed': '目前網路連線失敗，請確認網路後再試',
+        'auth/invalid-credential': '主管 Email 或密碼錯誤',
+        'auth/wrong-password': '主管 Email 或密碼錯誤',
+        'auth/user-not-found': '找不到這個主管帳號',
+        'auth/user-disabled': '這個主管帳號已停用',
+        'auth/invalid-email': 'Email 格式不正確',
+        'auth/weak-password': '密碼至少需要 6 碼',
+        'auth/email-already-in-use': '這個 Email 已經建立過帳號'
+      };
+      return messages[code] || fallback;
+    }
+    function ownerVerificationCooldownSeconds() {
+      return Math.max(0, Math.ceil((state.ownerVerificationResendAt - Date.now()) / 1000));
+    }
+    function scheduleVerificationCooldownTick() {
+      clearTimeout(window.__verificationCooldownTimer);
+      if (state.view === 'login' && state.ownerVerificationPending && ownerVerificationCooldownSeconds() > 0) {
+        window.__verificationCooldownTimer = setTimeout(render, 1000);
+      }
+    }
 
     function load() {
       try {
@@ -1690,6 +1737,7 @@
         </div></div>`;
     }
     function renderLogin() {
+      const verificationCooldown = ownerVerificationCooldownSeconds();
       document.getElementById('app').innerHTML = `
         <div class="login">
           <section class="login-card">
@@ -1702,7 +1750,7 @@
               <div class="error" id="managerLoginError"></div>
               <button class="primary" type="submit" style="width:100%; padding:13px">主管登入</button>
             </form>
-            ${state.ownerVerificationPending ? `<div class="verification-box"><strong>驗證信已寄到 ${escapeHtml(state.ownerVerificationEmail || '主管信箱')}</strong><span>請到信箱點開驗證連結，回到這裡後按下確認。</span><button class="primary" data-action="refreshOwnerVerification">我已完成 Email 驗證</button><button class="secondary" data-action="cancelOwnerVerification">改用其他帳號</button></div>` : `<details class="owner-setup"><summary>首次建立最高主管</summary><form id="ownerSetupForm" class="login-section"><input id="ownerDisplayName" autocomplete="name" placeholder="最高主管姓名" required /><input value="ed56671056@gmail.com" type="email" readonly aria-label="最高主管 Email" /><input id="ownerPassword" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="設定至少 6 碼密碼" required /><input id="ownerPasswordConfirm" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="再輸入一次密碼" required /><div class="error" id="ownerSetupError"></div><button class="primary" type="submit" style="width:100%; padding:13px">建立最高主管並寄驗證信</button></form></details>`}
+            ${state.ownerVerificationPending ? `<div class="verification-box"><strong>Email 驗證連結已寄到 ${escapeHtml(state.ownerVerificationEmail || '主管信箱')}</strong><span>這不是數字驗證碼。請點開信件中的驗證連結，再回到這裡確認。</span><div class="verification-details">寄件者：<strong>noreply@igym-1fca5.firebaseapp.com</strong><br>標題：<strong>Verify your email for IGYM</strong><br>收件匣沒有時，請檢查垃圾郵件與促銷內容。</div><div class="verification-actions"><button class="primary" data-action="refreshOwnerVerification">我已完成 Email 驗證</button><button class="secondary" data-action="resendOwnerVerification" ${verificationCooldown ? 'disabled' : ''}>${verificationCooldown ? `${verificationCooldown} 秒後可重寄` : '重新寄送 Email 驗證連結'}</button><button class="secondary" data-action="cancelOwnerVerification">改用其他帳號</button></div></div>` : `<details class="owner-setup"><summary>首次建立最高主管</summary><form id="ownerSetupForm" class="login-section"><input id="ownerDisplayName" autocomplete="name" placeholder="最高主管姓名" required /><input value="ed56671056@gmail.com" type="email" readonly aria-label="最高主管 Email" /><input id="ownerPassword" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="設定至少 6 碼密碼" required /><input id="ownerPasswordConfirm" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="再輸入一次密碼" required /><div class="error" id="ownerSetupError"></div><button class="primary" type="submit" style="width:100%; padding:13px">建立最高主管並寄 Email 驗證連結</button></form></details>`}
             <div class="login-divider">或</div>
             <form id="employeeLoginForm" class="login-section">
               <h2>員工查看班表</h2>
@@ -1727,6 +1775,13 @@
           button.disabled = true;
           errorBox.textContent = '正在驗證主管權限...';
           const manager = await window.signInFinanceManager(email, password);
+          if (manager?.pendingVerification) {
+            state.ownerVerificationPending = true;
+            state.ownerVerificationEmail = manager.email || email;
+            state.ownerVerificationResendAt = 0;
+            render();
+            return;
+          }
           state.adminAuthenticated = true;
           state.managerUser = manager;
           state.view = 'admin';
@@ -1734,7 +1789,7 @@
           render();
         } catch (error) {
           console.error('Manager sign-in failed:', error);
-          errorBox.textContent = error.message || '主管登入失敗，請檢查帳號與密碼';
+          errorBox.textContent = firebaseAuthErrorMessage(error, error.message || '主管登入失敗，請檢查帳號與密碼');
           button.disabled = false;
         }
       });
@@ -1761,6 +1816,7 @@
           if (result?.pendingVerification) {
             state.ownerVerificationPending = true;
             state.ownerVerificationEmail = result.email || 'ed56671056@gmail.com';
+            state.ownerVerificationResendAt = Date.now() + 60 * 1000;
             render();
             return;
           }
@@ -1772,7 +1828,7 @@
           render();
         } catch (error) {
           console.error('Owner bootstrap failed:', error);
-          errorBox.textContent = error.message || '最高主管帳號建立失敗';
+          errorBox.textContent = firebaseAuthErrorMessage(error, error.message || '最高主管帳號建立失敗');
           button.disabled = false;
         }
       });
@@ -1789,6 +1845,7 @@
         state.tab = 'weekly';
         render();
       });
+      scheduleVerificationCooldownTick();
     }
     function renderWeekly() {
       const mobile = isMobileView() || isLandscapeMobileView();
@@ -2238,7 +2295,7 @@
           if (result?.pendingVerification) {
             state.ownerVerificationPending = true;
             state.ownerVerificationEmail = result.email || state.ownerVerificationEmail;
-            showToast('信箱尚未完成驗證，請點開驗證信中的連結');
+            showToast('Email 尚未完成驗證，請點開信件中的驗證連結');
             render();
             return;
           }
@@ -2249,7 +2306,34 @@
           state.tab = 'weekly';
           render();
         } catch (error) {
-          showToast(error.message || 'Email 驗證確認失敗');
+          showToast(firebaseAuthErrorMessage(error, error.message || 'Email 驗證確認失敗'));
+        }
+        return;
+      }
+      if (action === 'resendOwnerVerification') {
+        if (ownerVerificationCooldownSeconds() > 0) return;
+        try {
+          if (!window.resendOwnerVerification) throw new Error('Firebase 驗證服務尚未完成載入');
+          const result = await window.resendOwnerVerification();
+          if (!result?.pendingVerification) {
+            state.ownerVerificationPending = false;
+            state.adminAuthenticated = true;
+            state.managerUser = result;
+            state.view = 'admin';
+            state.tab = 'weekly';
+            render();
+            return;
+          }
+          state.ownerVerificationPending = true;
+          state.ownerVerificationEmail = result.email || state.ownerVerificationEmail;
+          state.ownerVerificationResendAt = Date.now() + 60 * 1000;
+          showToast('新的 Email 驗證連結已寄出');
+          render();
+        } catch (error) {
+          console.error('Verification resend failed:', error);
+          if (error?.code === 'auth/too-many-requests') state.ownerVerificationResendAt = Date.now() + 60 * 1000;
+          showToast(firebaseAuthErrorMessage(error, error.message || 'Email 驗證連結寄送失敗'));
+          render();
         }
         return;
       }
@@ -2257,6 +2341,7 @@
         try { await window.signOutFinanceManager?.(); } catch {}
         state.ownerVerificationPending = false;
         state.ownerVerificationEmail = '';
+        state.ownerVerificationResendAt = 0;
         render();
         return;
       }
@@ -2273,6 +2358,7 @@
         state.managerUser = null;
         state.ownerVerificationPending = false;
         state.ownerVerificationEmail = '';
+        state.ownerVerificationResendAt = 0;
         state.financeLoaded = false;
         state.financeMonths = {};
         state.managerAccounts = [];
@@ -2587,6 +2673,7 @@
         state.managerUser = detail.user || null;
         state.ownerVerificationPending = false;
         state.ownerVerificationEmail = '';
+        state.ownerVerificationResendAt = 0;
         if (state.view === 'login') {
           state.view = 'admin';
           state.tab = 'weekly';
