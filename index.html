@@ -154,7 +154,7 @@
     .finance-month-control { display: flex; align-items: center; gap: 8px; }
     .finance-month-control label { color: #475569; font-size: 12px; font-weight: 900; }
     .finance-month-control select, .finance-month-control input { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 10px; font-weight: 900; }
-    .finance-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: #e8eef5; }
+    .finance-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: #e8eef5; }
     .finance-tab { min-height: 38px; border-radius: 8px; background: transparent; color: #64748b; font-size: 12px; font-weight: 950; }
     .finance-tab.active { background: white; color: #111827; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
     .finance-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -212,6 +212,25 @@
     .finance-import-preview.error { border-color: #fecaca; background: #fef2f2; }
     .finance-status { border-radius: 8px; padding: 10px 12px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 900; }
     .finance-status.error { background: #fef2f2; color: #b91c1c; }
+    .owner-setup { margin-top: 14px; border: 1px solid #c7d2fe; border-radius: 14px; background: #eef2ff; overflow: hidden; }
+    .owner-setup summary { cursor: pointer; padding: 12px 14px; color: #3730a3; text-align: center; font-size: 13px; font-weight: 950; }
+    .owner-setup form { padding: 0 12px 12px; }
+    .verification-box { display: grid; gap: 9px; margin-top: 12px; border: 1px solid #86efac; border-radius: 12px; background: #f0fdf4; padding: 12px; color: #166534; text-align: center; font-size: 12px; font-weight: 900; line-height: 1.6; }
+    .manager-account-form { display: grid; grid-template-columns: 1fr 1.2fr 1fr auto; gap: 9px; align-items: end; }
+    .manager-account-list { display: grid; gap: 8px; }
+    .manager-account-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(210px, 1.2fr) auto auto; gap: 10px; align-items: center; border-bottom: 1px solid #e2e8f0; padding: 10px 0; }
+    .manager-account-row:last-child { border-bottom: 0; }
+    .manager-account-name strong, .manager-account-name span { display: block; }
+    .manager-account-name span { margin-top: 3px; color: #64748b; font-size: 11px; font-weight: 800; }
+    .manager-account-status { display: flex; gap: 6px; flex-wrap: wrap; }
+    .account-badge { border-radius: 999px; background: #e2e8f0; color: #475569; padding: 4px 8px; font-size: 10px; font-weight: 950; white-space: nowrap; }
+    .account-badge.owner { background: #ede9fe; color: #5b21b6; }
+    .account-badge.active { background: #dcfce7; color: #166534; }
+    .account-badge.inactive { background: #fee2e2; color: #b91c1c; }
+    .account-badge.verified { background: #dbeafe; color: #1d4ed8; }
+    .manager-account-actions { display: flex; gap: 6px; justify-content: flex-end; }
+    .manager-account-actions button { padding: 7px 9px; font-size: 11px; }
+    .verification-resend { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: end; margin-top: 10px; border: 1px solid #fde68a; border-radius: 8px; background: #fffbeb; padding: 10px; }
     @media (max-width: 760px) {
       .app { padding: 8px; }
       .shell { height: calc(100vh - 16px); height: calc(100dvh - 16px); gap: 8px; }
@@ -294,6 +313,11 @@
       .finance-imports { grid-template-columns: 1fr; }
       .finance-actions { display: grid; grid-template-columns: 1fr; }
       .finance-actions button { width: 100%; }
+      .manager-account-form { grid-template-columns: 1fr; }
+      .manager-account-row { grid-template-columns: 1fr; gap: 7px; }
+      .manager-account-actions { display: grid; grid-template-columns: 1fr 1fr; justify-content: stretch; }
+      .manager-account-actions button { width: 100%; }
+      .verification-resend { grid-template-columns: 1fr; }
     }
     @media (orientation: landscape) and (max-height: 520px) {
       body { overflow: auto; }
@@ -370,7 +394,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, getDocs } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, onAuthStateChanged, reload, setPersistence, inMemoryPersistence } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: 'AIzaSyBwypaoiORkxJZqjbg-3XkHwmCHM7vTIZM',
@@ -381,22 +405,98 @@
       appId: '1:225172176853:web:aa924ce203f7a948a1875c'
     };
 
+    const OWNER_EMAIL = 'ed56671056@gmail.com';
     const firebaseApp = initializeApp(firebaseConfig);
+    const provisioningApp = initializeApp(firebaseConfig, 'igym-admin-provisioning');
     const firestoreDb = getFirestore(firebaseApp);
     const firebaseAuth = getAuth(firebaseApp);
+    const provisioningAuth = getAuth(provisioningApp);
+    await setPersistence(provisioningAuth, inMemoryPersistence);
+
+    function adminRecord(snapshot, fallback = {}) {
+      const data = snapshot?.data?.() || fallback;
+      return {
+        uid: snapshot?.id || fallback.uid || '',
+        email: data.email || '',
+        displayName: data.displayName || '',
+        role: data.role || 'manager',
+        active: data.active === true,
+        emailVerified: data.emailVerified === true,
+        createdAt: data.createdAt || null,
+        createdBy: data.createdBy || ''
+      };
+    }
+
+    async function ensureOwnerAdmin(user, displayName = '最高主管') {
+      if (!user || user.email?.toLowerCase() !== OWNER_EMAIL || !user.emailVerified) return;
+      const ownerRef = doc(firestoreDb, 'admins', user.uid);
+      const ownerSnapshot = await getDoc(ownerRef);
+      if (!ownerSnapshot.exists()) {
+        await setDoc(ownerRef, {
+          email: OWNER_EMAIL,
+          displayName: displayName || '最高主管',
+          role: 'owner',
+          active: true,
+          emailVerified: true,
+          createdAt: serverTimestamp(),
+          createdBy: user.uid,
+          lastLoginAt: serverTimestamp()
+        });
+      }
+    }
 
     async function verifyManager(user) {
       if (!user) throw new Error('請先登入主管帳號');
+      await reload(user);
+      if (!user.emailVerified) throw new Error('請先到信箱完成 Email 驗證');
+      await ensureOwnerAdmin(user);
       const adminSnapshot = await getDoc(doc(firestoreDb, 'admins', user.uid));
       if (!adminSnapshot.exists() || adminSnapshot.data()?.active !== true) {
-        throw new Error('此帳號沒有主管權限，請確認 admins 名單');
+        throw new Error('此帳號沒有主管權限，或帳號目前已停用');
       }
-      return { uid: user.uid, email: user.email || '' };
+      await setDoc(doc(firestoreDb, 'admins', user.uid), {
+        emailVerified: true,
+        lastLoginAt: serverTimestamp()
+      }, { merge: true });
+      return adminRecord(adminSnapshot, { uid: user.uid, email: user.email || '' });
+    }
+
+    async function requireOwner() {
+      const manager = await verifyManager(firebaseAuth.currentUser);
+      if (manager.role !== 'owner') throw new Error('只有最高主管可以管理主管帳號');
+      return manager;
     }
 
     window.firebaseApp = firebaseApp;
     window.firestoreDb = firestoreDb;
     window.firebaseAuth = firebaseAuth;
+    window.OWNER_EMAIL = OWNER_EMAIL;
+    window.bootstrapOwnerAccount = async function bootstrapOwnerAccount(displayName, password) {
+      let user;
+      try {
+        const credential = await createUserWithEmailAndPassword(firebaseAuth, OWNER_EMAIL, password);
+        user = credential.user;
+      } catch (error) {
+        if (error?.code !== 'auth/email-already-in-use') throw error;
+        const credential = await signInWithEmailAndPassword(firebaseAuth, OWNER_EMAIL, password);
+        user = credential.user;
+      }
+      await reload(user);
+      if (!user.emailVerified) {
+        await sendEmailVerification(user, { url: location.href.split('#')[0] });
+        return { pendingVerification: true, email: OWNER_EMAIL };
+      }
+      await ensureOwnerAdmin(user, displayName);
+      return verifyManager(user);
+    };
+    window.refreshOwnerVerification = async function refreshOwnerVerification() {
+      const user = firebaseAuth.currentUser;
+      if (!user) throw new Error('請重新輸入最高主管 Email 與密碼');
+      await reload(user);
+      if (!user.emailVerified) return { pendingVerification: true, email: user.email || OWNER_EMAIL };
+      await ensureOwnerAdmin(user);
+      return verifyManager(user);
+    };
     window.signInFinanceManager = async function signInFinanceManager(email, password) {
       const credential = await signInWithEmailAndPassword(firebaseAuth, email, password);
       try {
@@ -408,6 +508,69 @@
     };
     window.signOutFinanceManager = async function signOutFinanceManager() {
       await signOut(firebaseAuth);
+      return true;
+    };
+    window.listManagerAccounts = async function listManagerAccounts() {
+      await requireOwner();
+      const snapshot = await getDocs(collection(firestoreDb, 'admins'));
+      return snapshot.docs.map(item => adminRecord(item)).sort((left, right) => {
+        if (left.role !== right.role) return left.role === 'owner' ? -1 : 1;
+        return left.displayName.localeCompare(right.displayName, 'zh-Hant');
+      });
+    };
+    window.createManagerAccount = async function createManagerAccount({ email, displayName, password }) {
+      const owner = await requireOwner();
+      const normalizedEmail = String(email || '').trim().toLowerCase();
+      const normalizedName = String(displayName || '').trim();
+      if (!normalizedEmail || !normalizedName || String(password || '').length < 6) throw new Error('請填寫姓名、Email 與至少 6 碼臨時密碼');
+      if (normalizedEmail === OWNER_EMAIL) throw new Error('最高主管帳號已固定，不能重複建立');
+      let newUser;
+      try {
+        const credential = await createUserWithEmailAndPassword(provisioningAuth, normalizedEmail, password);
+        newUser = credential.user;
+        await sendEmailVerification(newUser, { url: location.href.split('#')[0] });
+        await setDoc(doc(firestoreDb, 'admins', newUser.uid), {
+          email: normalizedEmail,
+          displayName: normalizedName,
+          role: 'manager',
+          active: true,
+          emailVerified: false,
+          verificationSentAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          createdBy: owner.uid
+        });
+        return { uid: newUser.uid, email: normalizedEmail, displayName: normalizedName, role: 'manager', active: true, emailVerified: false };
+      } finally {
+        if (provisioningAuth.currentUser) await signOut(provisioningAuth);
+      }
+    };
+    window.resendManagerVerification = async function resendManagerVerification(email, password) {
+      const owner = await requireOwner();
+      const credential = await signInWithEmailAndPassword(provisioningAuth, String(email || '').trim(), password);
+      try {
+        await sendEmailVerification(credential.user, { url: location.href.split('#')[0] });
+        await setDoc(doc(firestoreDb, 'admins', credential.user.uid), {
+          verificationSentAt: serverTimestamp(),
+          updatedBy: owner.uid,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        return true;
+      } finally {
+        await signOut(provisioningAuth);
+      }
+    };
+    window.setManagerAccountActive = async function setManagerAccountActive(uid, active) {
+      const owner = await requireOwner();
+      const targetRef = doc(firestoreDb, 'admins', uid);
+      const targetSnapshot = await getDoc(targetRef);
+      if (!targetSnapshot.exists()) throw new Error('找不到此主管帳號');
+      if (targetSnapshot.data()?.role === 'owner') throw new Error('最高主管帳號不能停用');
+      await setDoc(targetRef, { active: active === true, updatedBy: owner.uid, updatedAt: serverTimestamp() }, { merge: true });
+      return true;
+    };
+    window.sendManagerPasswordReset = async function sendManagerPasswordReset(email) {
+      await requireOwner();
+      await sendPasswordResetEmail(firebaseAuth, String(email || '').trim(), { url: location.href.split('#')[0] });
       return true;
     };
     window.loadFinanceMonthsFromCloud = async function loadFinanceMonthsFromCloud() {
@@ -455,6 +618,11 @@
     onAuthStateChanged(firebaseAuth, async user => {
       if (!user) {
         window.dispatchEvent(new CustomEvent('manager-auth-changed', { detail: { authenticated: false } }));
+        return;
+      }
+      await reload(user);
+      if (!user.emailVerified) {
+        window.dispatchEvent(new CustomEvent('manager-auth-changed', { detail: { authenticated: false, pendingVerification: true, email: user.email || '' } }));
         return;
       }
       try {
@@ -653,6 +821,8 @@
       selected: null,
       adminAuthenticated: false,
       managerUser: null,
+      ownerVerificationPending: false,
+      ownerVerificationEmail: '',
       financeSection: 'overview',
       financeSelectedPeriod: '2026-06',
       financeCoachId: 'coach-wally',
@@ -662,7 +832,12 @@
       financeError: '',
       financeStatus: '',
       financeImport: null,
-      financeCharts: []
+      financeCharts: [],
+      managerAccounts: [],
+      managerAccountsLoaded: false,
+      managerAccountsLoading: false,
+      managerAccountsError: '',
+      managerVerificationTarget: null
     };
 
     function load() {
@@ -1221,6 +1396,74 @@
         ${renderFinanceImportPreview()}
       </div>`;
     }
+    function managerCreatedText(value) {
+      try {
+        const date = value?.toDate ? value.toDate() : value?.seconds ? new Date(value.seconds * 1000) : value ? new Date(value) : null;
+        return date && Number.isFinite(date.getTime()) ? date.toLocaleString('zh-TW', { dateStyle: 'medium', timeStyle: 'short' }) : '剛建立';
+      } catch { return '剛建立'; }
+    }
+    async function ensureManagerAccountsLoaded(force = false) {
+      if (state.managerUser?.role !== 'owner' || state.managerAccountsLoading || (state.managerAccountsLoaded && !force)) return;
+      state.managerAccountsLoading = true;
+      state.managerAccountsError = '';
+      if (state.tab === 'finance' && state.financeSection === 'accounts') render();
+      try {
+        if (!window.listManagerAccounts) throw new Error('主管帳號服務尚未完成載入');
+        state.managerAccounts = await window.listManagerAccounts();
+        state.managerAccountsLoaded = true;
+      } catch (error) {
+        console.error('Manager account list failed:', error);
+        state.managerAccountsError = error.message || '主管帳號讀取失敗';
+      } finally {
+        state.managerAccountsLoading = false;
+        if (state.tab === 'finance' && state.financeSection === 'accounts') render();
+      }
+    }
+    function renderManagerAccounts() {
+      if (state.managerUser?.role !== 'owner') return '<div class="finance-status error">只有最高主管可以管理主管帳號</div>';
+      const target = state.managerVerificationTarget;
+      return `<div class="finance-form">
+        <section class="finance-form-section"><h3>新增主管</h3><p class="finance-card-note">建立後會寄出 Email 驗證信；臨時密碼不會儲存在網站或資料庫。</p>
+          <form id="managerAccountForm" class="manager-account-form">
+            <label class="finance-field">姓名<input id="newManagerName" autocomplete="name" required /></label>
+            <label class="finance-field">Email<input id="newManagerEmail" type="email" autocomplete="email" required /></label>
+            <label class="finance-field">臨時密碼<input id="newManagerPassword" type="password" minlength="6" autocomplete="new-password" required /></label>
+            <button class="primary" type="submit">新增並寄驗證信</button>
+          </form>
+        </section>
+        ${target ? `<section class="verification-resend"><label class="finance-field">重寄給 ${escapeHtml(target.email)}<input id="managerVerificationPassword" type="password" autocomplete="current-password" placeholder="輸入此主管目前密碼" /></label><button class="primary" data-action="confirmManagerVerification" data-email="${escapeHtml(target.email)}">寄出驗證信</button><button class="secondary" data-action="cancelManagerVerification">取消</button></section>` : ''}
+        <section class="finance-form-section"><div class="finance-head"><div><h3>主管帳號</h3><p class="finance-card-note">最高主管不能被停用；一般主管停用後會立刻失去財報權限。</p></div><button class="secondary" data-action="refreshManagerAccounts">重新整理</button></div>
+          ${state.managerAccountsError ? `<div class="finance-status error">${escapeHtml(state.managerAccountsError)}</div>` : ''}
+          ${state.managerAccountsLoading && !state.managerAccountsLoaded ? '<div class="finance-status">正在讀取主管帳號...</div>' : `<div class="manager-account-list">${state.managerAccounts.map(account => `<div class="manager-account-row" data-manager-account="${escapeHtml(account.uid)}">
+            <div class="manager-account-name"><strong>${escapeHtml(account.displayName || account.email)}</strong><span>${escapeHtml(account.email)}</span><span>建立：${escapeHtml(managerCreatedText(account.createdAt))}</span></div>
+            <div class="manager-account-status"><span class="account-badge ${account.role === 'owner' ? 'owner' : ''}">${account.role === 'owner' ? '最高主管' : '主管'}</span><span class="account-badge ${account.active ? 'active' : 'inactive'}">${account.active ? '已啟用' : '已停用'}</span><span class="account-badge ${account.emailVerified ? 'verified' : ''}">${account.emailVerified ? 'Email 已驗證' : '等待驗證'}</span></div>
+            <div></div>
+            <div class="manager-account-actions">${account.role === 'owner' ? '<span class="account-badge owner">受保護</span>' : `<button class="secondary" data-action="resetManagerPassword" data-email="${escapeHtml(account.email)}">重設密碼</button>${!account.emailVerified ? `<button class="secondary" data-action="openManagerVerification" data-uid="${escapeHtml(account.uid)}" data-email="${escapeHtml(account.email)}">重寄驗證</button>` : ''}<button class="${account.active ? 'danger' : 'secondary'}" data-action="toggleManagerActive" data-uid="${escapeHtml(account.uid)}" data-active="${account.active ? 'false' : 'true'}">${account.active ? '停用' : '啟用'}</button>`}</div>
+          </div>`).join('') || '<div class="empty">尚未建立其他主管</div>'}</div>`}
+        </section>
+      </div>`;
+    }
+    async function handleManagerAccountSubmit(form) {
+      const displayName = form.querySelector('#newManagerName')?.value.trim();
+      const email = form.querySelector('#newManagerEmail')?.value.trim();
+      const password = form.querySelector('#newManagerPassword')?.value || '';
+      if (!displayName || !email || password.length < 6) {
+        financeStatus('請填寫姓名、Email 與至少 6 碼臨時密碼', true);
+        return;
+      }
+      try {
+        state.financeStatus = '正在建立主管帳號並寄送驗證信...';
+        state.financeError = '';
+        render();
+        await window.createManagerAccount({ displayName, email, password });
+        state.financeStatus = `已建立 ${displayName}，驗證信已寄到 ${email}`;
+        state.managerAccountsLoaded = false;
+        await ensureManagerAccountsLoaded(true);
+      } catch (error) {
+        console.error('Manager account creation failed:', error);
+        financeStatus(error.message || '主管帳號建立失敗', true);
+      }
+    }
     function clearFinanceCharts() {
       state.financeCharts.forEach(chart => { try { chart.destroy(); } catch {} });
       state.financeCharts = [];
@@ -1289,10 +1532,12 @@
       }
       const current = financeCurrent();
       const previous = financePrevious();
+      if (state.financeSection === 'accounts' && state.managerUser?.role !== 'owner') state.financeSection = 'overview';
       const sectionContent = state.financeSection === 'members' ? renderFinanceMembers(current, previous)
         : state.financeSection === 'trend' ? renderFinanceTrend()
         : state.financeSection === 'coaches' ? renderFinanceCoaches()
         : state.financeSection === 'manage' ? renderFinanceManage(current)
+        : state.financeSection === 'accounts' ? renderManagerAccounts()
         : renderFinanceOverview(current, previous);
       layout(`<section class="panel"><div class="finance-panel"><div class="finance-dashboard">
         <div class="finance-head"><div class="finance-title"><h2>IGYM 營運財報</h2><p>主管專用 · 雲端同步</p></div><div class="finance-month-control"><label>查看月份</label><select data-action="financePeriodSelect">${financeMonthOptions()}</select></div></div>
@@ -1302,12 +1547,16 @@
           <button class="finance-tab ${state.financeSection === 'trend' ? 'active' : ''}" data-finance-section="trend">13 月趨勢</button>
           <button class="finance-tab ${state.financeSection === 'coaches' ? 'active' : ''}" data-finance-section="coaches">教練績效</button>
           <button class="finance-tab ${state.financeSection === 'manage' ? 'active' : ''}" data-finance-section="manage">資料管理</button>
+          ${state.managerUser?.role === 'owner' ? `<button class="finance-tab ${state.financeSection === 'accounts' ? 'active' : ''}" data-finance-section="accounts">主管帳號</button>` : ''}
         </div>
         ${state.financeStatus ? `<div class="finance-status ${state.financeError ? 'error' : ''}">${escapeHtml(state.financeStatus)}</div>` : ''}
         ${sectionContent}
       </div></div></section>`);
       const selector = document.querySelector('[data-action="financePeriodSelect"]');
       if (selector) selector.value = state.financeSelectedPeriod;
+      const managerForm = document.getElementById('managerAccountForm');
+      if (managerForm) managerForm.addEventListener('submit', event => { event.preventDefault(); handleManagerAccountSubmit(managerForm); });
+      if (state.financeSection === 'accounts' && !state.managerAccountsLoaded && !state.managerAccountsLoading) setTimeout(ensureManagerAccountsLoaded, 0);
       setTimeout(renderFinanceCharts, 0);
     }
     function parseCsvRows(text) {
@@ -1453,6 +1702,7 @@
               <div class="error" id="managerLoginError"></div>
               <button class="primary" type="submit" style="width:100%; padding:13px">主管登入</button>
             </form>
+            ${state.ownerVerificationPending ? `<div class="verification-box"><strong>驗證信已寄到 ${escapeHtml(state.ownerVerificationEmail || '主管信箱')}</strong><span>請到信箱點開驗證連結，回到這裡後按下確認。</span><button class="primary" data-action="refreshOwnerVerification">我已完成 Email 驗證</button><button class="secondary" data-action="cancelOwnerVerification">改用其他帳號</button></div>` : `<details class="owner-setup"><summary>首次建立最高主管</summary><form id="ownerSetupForm" class="login-section"><input id="ownerDisplayName" autocomplete="name" placeholder="最高主管姓名" required /><input value="ed56671056@gmail.com" type="email" readonly aria-label="最高主管 Email" /><input id="ownerPassword" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="設定至少 6 碼密碼" required /><input id="ownerPasswordConfirm" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="再輸入一次密碼" required /><div class="error" id="ownerSetupError"></div><button class="primary" type="submit" style="width:100%; padding:13px">建立最高主管並寄驗證信</button></form></details>`}
             <div class="login-divider">或</div>
             <form id="employeeLoginForm" class="login-section">
               <h2>員工查看班表</h2>
@@ -1485,6 +1735,44 @@
         } catch (error) {
           console.error('Manager sign-in failed:', error);
           errorBox.textContent = error.message || '主管登入失敗，請檢查帳號與密碼';
+          button.disabled = false;
+        }
+      });
+      const ownerSetupForm = document.getElementById('ownerSetupForm');
+      if (ownerSetupForm) ownerSetupForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        const displayName = document.getElementById('ownerDisplayName').value.trim();
+        const password = document.getElementById('ownerPassword').value;
+        const confirmation = document.getElementById('ownerPasswordConfirm').value;
+        const errorBox = document.getElementById('ownerSetupError');
+        const button = event.submitter;
+        if (password.length < 6 || password !== confirmation) {
+          errorBox.textContent = password !== confirmation ? '兩次輸入的密碼不一致' : '密碼至少需要 6 碼';
+          return;
+        }
+        if (!window.bootstrapOwnerAccount) {
+          errorBox.textContent = 'Firebase 尚未完成載入，請稍後再試';
+          return;
+        }
+        try {
+          button.disabled = true;
+          errorBox.textContent = '正在建立最高主管帳號...';
+          const result = await window.bootstrapOwnerAccount(displayName, password);
+          if (result?.pendingVerification) {
+            state.ownerVerificationPending = true;
+            state.ownerVerificationEmail = result.email || 'ed56671056@gmail.com';
+            render();
+            return;
+          }
+          state.adminAuthenticated = true;
+          state.managerUser = result;
+          state.ownerVerificationPending = false;
+          state.view = 'admin';
+          state.tab = 'weekly';
+          render();
+        } catch (error) {
+          console.error('Owner bootstrap failed:', error);
+          errorBox.textContent = error.message || '最高主管帳號建立失敗';
           button.disabled = false;
         }
       });
@@ -1840,6 +2128,7 @@
         return;
       }
       if (target.dataset.financeSection) {
+        if (target.dataset.financeSection === 'accounts' && state.managerUser?.role !== 'owner') return;
         state.financeSection = target.dataset.financeSection;
         state.financeStatus = '';
         state.financeError = '';
@@ -1943,6 +2232,34 @@
         return;
       }
       const action = target.dataset.action;
+      if (action === 'refreshOwnerVerification') {
+        try {
+          const result = await window.refreshOwnerVerification();
+          if (result?.pendingVerification) {
+            state.ownerVerificationPending = true;
+            state.ownerVerificationEmail = result.email || state.ownerVerificationEmail;
+            showToast('信箱尚未完成驗證，請點開驗證信中的連結');
+            render();
+            return;
+          }
+          state.ownerVerificationPending = false;
+          state.adminAuthenticated = true;
+          state.managerUser = result;
+          state.view = 'admin';
+          state.tab = 'weekly';
+          render();
+        } catch (error) {
+          showToast(error.message || 'Email 驗證確認失敗');
+        }
+        return;
+      }
+      if (action === 'cancelOwnerVerification') {
+        try { await window.signOutFinanceManager?.(); } catch {}
+        state.ownerVerificationPending = false;
+        state.ownerVerificationEmail = '';
+        render();
+        return;
+      }
       if (action === 'logout') {
         if (state.adminAuthenticated && window.signOutFinanceManager) {
           try { await window.signOutFinanceManager(); } catch (error) { console.warn('Manager sign-out failed:', error); }
@@ -1954,8 +2271,12 @@
         state.editingEmployee = null;
         state.adminAuthenticated = false;
         state.managerUser = null;
+        state.ownerVerificationPending = false;
+        state.ownerVerificationEmail = '';
         state.financeLoaded = false;
         state.financeMonths = {};
+        state.managerAccounts = [];
+        state.managerAccountsLoaded = false;
         render();
         return;
       }
@@ -2007,6 +2328,66 @@
         return;
       }
       if (action === 'toggleAlerts') { state.alertsOpen = !state.alertsOpen; render(); return; }
+      if (action === 'refreshManagerAccounts') {
+        state.managerAccountsLoaded = false;
+        await ensureManagerAccountsLoaded(true);
+        return;
+      }
+      if (action === 'toggleManagerActive') {
+        try {
+          state.financeStatus = '正在更新主管權限...';
+          state.financeError = '';
+          render();
+          await window.setManagerAccountActive(target.dataset.uid, target.dataset.active === 'true');
+          state.financeStatus = target.dataset.active === 'true' ? '主管帳號已啟用' : '主管帳號已停用';
+          state.managerAccountsLoaded = false;
+          await ensureManagerAccountsLoaded(true);
+        } catch (error) {
+          console.error('Manager active-state update failed:', error);
+          financeStatus(error.message || '主管權限更新失敗', true);
+        }
+        return;
+      }
+      if (action === 'resetManagerPassword') {
+        try {
+          await window.sendManagerPasswordReset(target.dataset.email);
+          state.financeStatus = `密碼重設信已寄到 ${target.dataset.email}`;
+          state.financeError = '';
+          render();
+        } catch (error) {
+          console.error('Manager password reset failed:', error);
+          financeStatus(error.message || '密碼重設信寄送失敗', true);
+        }
+        return;
+      }
+      if (action === 'openManagerVerification') {
+        state.managerVerificationTarget = { uid: target.dataset.uid, email: target.dataset.email };
+        render();
+        return;
+      }
+      if (action === 'cancelManagerVerification') {
+        state.managerVerificationTarget = null;
+        render();
+        return;
+      }
+      if (action === 'confirmManagerVerification') {
+        const password = document.getElementById('managerVerificationPassword')?.value || '';
+        if (!password) {
+          financeStatus('請輸入此主管目前密碼，才能安全重寄驗證信', true);
+          return;
+        }
+        try {
+          await window.resendManagerVerification(target.dataset.email, password);
+          state.managerVerificationTarget = null;
+          state.financeStatus = `驗證信已重新寄到 ${target.dataset.email}`;
+          state.financeError = '';
+          render();
+        } catch (error) {
+          console.error('Manager verification resend failed:', error);
+          financeStatus(error.message || '驗證信寄送失敗', true);
+        }
+        return;
+      }
       if (action === 'saveFinanceMonth') {
         try {
           const { period, record } = collectFinanceMonthForm();
@@ -2204,10 +2585,16 @@
       if (detail.authenticated) {
         state.adminAuthenticated = true;
         state.managerUser = detail.user || null;
+        state.ownerVerificationPending = false;
+        state.ownerVerificationEmail = '';
         if (state.view === 'login') {
           state.view = 'admin';
           state.tab = 'weekly';
         }
+        render();
+      } else if (detail.pendingVerification && state.view === 'login') {
+        state.ownerVerificationPending = true;
+        state.ownerVerificationEmail = detail.email || '';
         render();
       } else if (state.view === 'admin') {
         clearFinanceCharts();
@@ -2215,6 +2602,8 @@
         state.managerUser = null;
         state.financeLoaded = false;
         state.financeMonths = {};
+        state.managerAccounts = [];
+        state.managerAccountsLoaded = false;
         state.view = 'login';
         state.tab = 'weekly';
         render();

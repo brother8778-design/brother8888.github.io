@@ -2,15 +2,63 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAdmin() {
+    function verifiedUser() {
       return request.auth != null
+        && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return verifiedUser()
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
     }
 
+    function isOwner() {
+      return isAdmin()
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'owner';
+    }
+
+    function isOwnerBootstrap(uid) {
+      return verifiedUser()
+        && request.auth.uid == uid
+        && request.auth.token.email == 'ed56671056@gmail.com'
+        && request.resource.data.email == 'ed56671056@gmail.com'
+        && request.resource.data.role == 'owner'
+        && request.resource.data.active == true
+        && request.resource.data.emailVerified == true
+        && request.resource.data.createdBy == uid;
+    }
+
+    function isManagerCreate() {
+      return isOwner()
+        && request.resource.data.role == 'manager'
+        && request.resource.data.active == true;
+    }
+
+    function isOwnerManagerUpdate() {
+      return isOwner()
+        && resource.data.role != 'owner'
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.createdBy == resource.data.createdBy;
+    }
+
+    function isVerifiedSelfUpdate(uid) {
+      return verifiedUser()
+        && request.auth.uid == uid
+        && resource.data.active == true
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.active == resource.data.active
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['emailVerified', 'lastLoginAt']);
+    }
+
     match /admins/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;
+      allow get: if verifiedUser() && (request.auth.uid == uid || isOwner());
+      allow list: if isOwner();
+      allow create: if isOwnerBootstrap(uid) || isManagerCreate();
+      allow update: if isOwnerManagerUpdate() || isVerifiedSelfUpdate(uid);
+      allow delete: if false;
     }
 
     match /finance_months/{period} {
