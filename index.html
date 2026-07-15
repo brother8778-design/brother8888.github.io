@@ -140,6 +140,78 @@
     .bar { position: absolute; top: 8px; height: 32px; display: grid; place-items: center; border-radius: 9px; border: 1px solid; font-size: 12px; font-weight: 950; }
     .empty { padding: 48px; text-align: center; color: #94a3b8; font-weight: 900; }
     .toast { position: fixed; right: 18px; bottom: 18px; z-index: 30; max-width: min(360px, calc(100vw - 36px)); border-radius: 14px; background: #0f172a; color: white; padding: 12px 14px; box-shadow: 0 14px 35px rgba(15,23,42,.22); font-size: 13px; font-weight: 900; }
+    .login-divider { display: flex; align-items: center; gap: 10px; margin: 18px 0; color: #94a3b8; font-size: 11px; font-weight: 900; }
+    .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
+    .login-section { display: grid; gap: 10px; }
+    .login-section h2 { margin: 0; font-size: 14px; text-align: center; }
+    .login-section input { letter-spacing: 0; text-align: left; font-size: 15px; }
+    .login-section .password-input { letter-spacing: .12em; text-align: center; }
+    .finance-panel { height: 100%; overflow: auto; padding: 14px; background: #f8fafc; }
+    .finance-dashboard { width: min(1420px, 100%); margin: 0 auto; display: grid; gap: 12px; }
+    .finance-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .finance-title h2 { margin: 0; font-size: 20px; }
+    .finance-title p { margin: 4px 0 0; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .finance-month-control { display: flex; align-items: center; gap: 8px; }
+    .finance-month-control label { color: #475569; font-size: 12px; font-weight: 900; }
+    .finance-month-control select, .finance-month-control input { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 10px; font-weight: 900; }
+    .finance-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: #e8eef5; }
+    .finance-tab { min-height: 38px; border-radius: 8px; background: transparent; color: #64748b; font-size: 12px; font-weight: 950; }
+    .finance-tab.active { background: white; color: #111827; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
+    .finance-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .finance-kpi, .finance-card { border: 1px solid #d7e0ea; border-radius: 8px; background: white; box-shadow: 0 5px 16px rgba(15,23,42,.04); }
+    .finance-kpi { min-height: 104px; padding: 15px; display: grid; align-content: space-between; gap: 8px; }
+    .finance-kpi-label { color: #64748b; font-size: 12px; font-weight: 900; }
+    .finance-kpi-value { font-size: 24px; font-weight: 950; font-variant-numeric: tabular-nums; }
+    .finance-delta { width: fit-content; border-radius: 999px; background: #f1f5f9; color: #475569; padding: 3px 7px; font-size: 11px; font-weight: 950; }
+    .finance-delta.up { background: #dcfce7; color: #166534; }
+    .finance-delta.down { background: #fee2e2; color: #b91c1c; }
+    .finance-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr); gap: 12px; }
+    .finance-card { padding: 14px; min-width: 0; }
+    .finance-card h3 { margin: 0 0 4px; font-size: 14px; }
+    .finance-card-note { margin: 0 0 12px; color: #64748b; font-size: 11px; font-weight: 800; }
+    .finance-table-wrap { overflow: auto; border: 1px solid #d7e0ea; }
+    .finance-table { min-width: 620px; border: 0; table-layout: auto; }
+    .finance-table th, .finance-table td { position: static; height: auto; padding: 9px 10px; text-align: right; font-size: 12px; }
+    .finance-table th:first-child, .finance-table td:first-child { text-align: left; }
+    .finance-table th { background: #f1f5f9; }
+    .finance-table .section-row td { background: #e8eef5; color: #334155; font-weight: 950; text-align: left; }
+    .finance-number { font-variant-numeric: tabular-nums; font-weight: 900; }
+    .chart-box { position: relative; width: 100%; min-height: 260px; }
+    .chart-box canvas { width: 100% !important; height: 260px !important; }
+    .fallback-chart { height: 230px; display: flex; align-items: end; gap: 6px; padding: 12px 4px 24px; border-bottom: 1px solid #cbd5e1; }
+    .fallback-bar { flex: 1; min-width: 12px; position: relative; border-radius: 4px 4px 0 0; background: #4f46e5; }
+    .fallback-bar span { position: absolute; left: 50%; bottom: -21px; transform: translateX(-50%); color: #64748b; font-size: 8px; font-weight: 900; white-space: nowrap; }
+    .trend-values { display: grid; grid-template-columns: repeat(13, minmax(56px, 1fr)); gap: 5px; margin-top: 10px; overflow-x: auto; }
+    .trend-point { border: 1px solid #dbe3ed; border-radius: 6px; background: #f8fafc; padding: 6px; text-align: center; }
+    .trend-point span { display: block; color: #64748b; font-size: 9px; font-weight: 900; }
+    .trend-point strong { display: block; margin-top: 2px; font-size: 10px; font-variant-numeric: tabular-nums; }
+    .coach-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .coach-toolbar select { border: 1px solid var(--line); border-radius: 9px; background: white; padding: 8px 10px; font-weight: 900; }
+    .coach-performance-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .coach-performance-card { min-width: 0; }
+    .coach-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 10px 0; }
+    .coach-stat { border-left: 3px solid #4f46e5; background: #f8fafc; padding: 7px 8px; }
+    .coach-stat span { display: block; color: #64748b; font-size: 9px; font-weight: 900; }
+    .coach-stat strong { display: block; margin-top: 2px; font-size: 13px; font-variant-numeric: tabular-nums; }
+    .finance-form { display: grid; gap: 12px; }
+    .finance-form-section { border: 1px solid #d7e0ea; border-radius: 8px; background: white; padding: 12px; }
+    .finance-form-section h3 { margin: 0 0 10px; font-size: 14px; }
+    .finance-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+    .finance-field { display: grid; gap: 5px; color: #475569; font-size: 11px; font-weight: 900; }
+    .finance-field input { min-width: 0; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; padding: 9px; font-weight: 900; }
+    .finance-coach-row { display: grid; grid-template-columns: minmax(145px, 1.2fr) repeat(4, minmax(90px, 1fr)); gap: 8px; align-items: end; padding: 9px 0; border-bottom: 1px solid #eef2f7; }
+    .finance-coach-row:last-child { border-bottom: 0; }
+    .finance-coach-name { align-self: center; font-size: 12px; font-weight: 950; }
+    .finance-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .finance-imports { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .finance-drop { border: 1px dashed #94a3b8; border-radius: 8px; background: #f8fafc; padding: 14px; }
+    .finance-drop strong, .finance-drop small { display: block; }
+    .finance-drop small { margin: 5px 0 10px; color: #64748b; line-height: 1.5; }
+    .finance-drop input { width: 100%; }
+    .finance-import-preview { border: 1px solid #c7d2fe; border-radius: 8px; background: #eef2ff; padding: 12px; }
+    .finance-import-preview.error { border-color: #fecaca; background: #fef2f2; }
+    .finance-status { border-radius: 8px; padding: 10px 12px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 900; }
+    .finance-status.error { background: #fef2f2; color: #b91c1c; }
     @media (max-width: 760px) {
       .app { padding: 8px; }
       .shell { height: calc(100vh - 16px); height: calc(100dvh - 16px); gap: 8px; }
@@ -197,6 +269,31 @@
       .timeline-grid > div { font-size: 11px; }
       .bar { font-size: 11px; }
       .toast { right: 10px; bottom: 10px; max-width: calc(100vw - 20px); }
+      .finance-panel { padding: 8px; }
+      .finance-dashboard { gap: 8px; }
+      .finance-head { align-items: stretch; flex-direction: column; }
+      .finance-title h2 { font-size: 18px; }
+      .finance-month-control { justify-content: space-between; }
+      .finance-month-control select { flex: 1; min-width: 0; }
+      .finance-tabs { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .finance-tab { flex: 0 0 auto; min-width: 88px; padding: 8px 10px; }
+      .finance-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+      .finance-kpi { min-height: 88px; padding: 11px; }
+      .finance-kpi-value { font-size: 18px; }
+      .finance-grid { grid-template-columns: 1fr; gap: 8px; }
+      .finance-card { padding: 10px; }
+      .finance-table { min-width: 560px; }
+      .chart-box, .chart-box canvas { min-height: 230px; height: 230px !important; }
+      .coach-toolbar { align-items: stretch; flex-direction: column; }
+      .coach-toolbar select { width: 100%; }
+      .coach-performance-grid { grid-template-columns: 1fr; }
+      .coach-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .finance-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .finance-coach-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .finance-coach-name { grid-column: 1 / -1; }
+      .finance-imports { grid-template-columns: 1fr; }
+      .finance-actions { display: grid; grid-template-columns: 1fr; }
+      .finance-actions button { width: 100%; }
     }
     @media (orientation: landscape) and (max-height: 520px) {
       body { overflow: auto; }
@@ -224,7 +321,7 @@
       html, body { width: 287mm; height: 200mm; overflow: hidden; }
       body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .app { padding: 0; min-height: auto; }
-      header, nav, .panel-head, .quickbar, .toolbar, .notice, .alerts, .alerts-panel, .picker, .mobile-controls-toggle, .mobile-week-switch, .mobile-top-toggle, .people-filter { display: none !important; }
+      header, nav, .panel-head, .quickbar, .toolbar, .notice, .alerts, .alerts-panel, .picker, .mobile-controls-toggle, .mobile-week-switch, .mobile-top-toggle, .people-filter, .finance-panel { display: none !important; }
       .shell, .panel { height: auto; min-height: 0; gap: 0; box-shadow: none; border: 0; }
       .panel { padding: 0; overflow: visible; }
       .table-wrap { overflow: visible; max-height: none; border: 0; }
@@ -269,9 +366,11 @@
 <body>
   <div id="app"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, getDocs } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: 'AIzaSyBwypaoiORkxJZqjbg-3XkHwmCHM7vTIZM',
@@ -284,9 +383,47 @@
 
     const firebaseApp = initializeApp(firebaseConfig);
     const firestoreDb = getFirestore(firebaseApp);
+    const firebaseAuth = getAuth(firebaseApp);
+
+    async function verifyManager(user) {
+      if (!user) throw new Error('請先登入主管帳號');
+      const adminSnapshot = await getDoc(doc(firestoreDb, 'admins', user.uid));
+      if (!adminSnapshot.exists() || adminSnapshot.data()?.active !== true) {
+        throw new Error('此帳號沒有主管權限，請確認 admins 名單');
+      }
+      return { uid: user.uid, email: user.email || '' };
+    }
 
     window.firebaseApp = firebaseApp;
     window.firestoreDb = firestoreDb;
+    window.firebaseAuth = firebaseAuth;
+    window.signInFinanceManager = async function signInFinanceManager(email, password) {
+      const credential = await signInWithEmailAndPassword(firebaseAuth, email, password);
+      try {
+        return await verifyManager(credential.user);
+      } catch (error) {
+        await signOut(firebaseAuth);
+        throw error;
+      }
+    };
+    window.signOutFinanceManager = async function signOutFinanceManager() {
+      await signOut(firebaseAuth);
+      return true;
+    };
+    window.loadFinanceMonthsFromCloud = async function loadFinanceMonthsFromCloud() {
+      await verifyManager(firebaseAuth.currentUser);
+      const snapshot = await getDocs(collection(firestoreDb, 'finance_months'));
+      return snapshot.docs.map(item => ({ period: item.id, ...item.data() }));
+    };
+    window.saveFinanceMonthToCloud = async function saveFinanceMonthToCloud(period, data) {
+      const manager = await verifyManager(firebaseAuth.currentUser);
+      return setDoc(doc(firestoreDb, 'finance_months', period), {
+        ...data,
+        period,
+        updatedBy: manager.uid,
+        updatedAt: serverTimestamp()
+      }, { merge: false });
+    };
     window.writeLogToFirestore = async function writeLogToFirestore(data) {
       return addDoc(collection(firestoreDb, 'logs'), {
         ...data,
@@ -315,6 +452,19 @@
       const snapshot = await getDoc(doc(firestoreDb, 'schedules', 'main'));
       return snapshot.exists() ? snapshot.data() : null;
     };
+    onAuthStateChanged(firebaseAuth, async user => {
+      if (!user) {
+        window.dispatchEvent(new CustomEvent('manager-auth-changed', { detail: { authenticated: false } }));
+        return;
+      }
+      try {
+        const manager = await verifyManager(user);
+        window.dispatchEvent(new CustomEvent('manager-auth-changed', { detail: { authenticated: true, user: manager } }));
+      } catch (error) {
+        console.warn('Firebase manager session rejected:', error);
+        await signOut(firebaseAuth);
+      }
+    });
     window.dispatchEvent(new Event('firebase-ready'));
   </script>
 
@@ -374,6 +524,104 @@
       { id: 'p5', name: '沈宥寧 YUKI', role: 'parttime', type: 'parttime' },
       { id: 'p6', name: '黃澤萱 ANNA', role: 'parttime', type: 'parttime' }
     ];
+    function financeMonthSeed(period, values = {}) {
+      return {
+        period,
+        store: {
+          singleEntry: { people: 0, revenue: 0, count100: 0, count120: 0, count150: 0, ...(values.singleEntry || {}) },
+          subscriptions: { newCount: 0, ...(values.subscriptions || {}) },
+          annualFull: { total: 0, newCount: 0, renewCount: 0, ...(values.annualFull || {}) },
+          annualLimited: { total: 0, newCount: 0, renewCount: 0, ...(values.annualLimited || {}) },
+          coaching: { totalRevenue: Number(values.coachingRevenue || 0), trialClasses: 0, newRevenue: 0, renewRevenue: 0, ...(values.coaching || {}) },
+          active: { subscriptions: 0, annualFull888: 0, annualFullLegacy788: 0, annualLimited788: 0, annualLimitedLegacy688: 0, ...(values.active || {}) }
+        },
+        coaches: {},
+        source: 'IGYM PPTX historical import'
+      };
+    }
+    const historicalFinanceMonths = {
+      '2025-06': financeMonthSeed('2025-06', { coachingRevenue: 835799 }),
+      '2025-07': financeMonthSeed('2025-07', { coachingRevenue: 1094400 }),
+      '2025-08': financeMonthSeed('2025-08', { coachingRevenue: 694200 }),
+      '2025-09': financeMonthSeed('2025-09', { coachingRevenue: 729600 }),
+      '2025-10': financeMonthSeed('2025-10', { coachingRevenue: 868800 }),
+      '2025-11': financeMonthSeed('2025-11', { coachingRevenue: 639600 }),
+      '2025-12': financeMonthSeed('2025-12', { coachingRevenue: 743200 }),
+      '2026-01': financeMonthSeed('2026-01', {
+        singleEntry: { people: 1096, revenue: 140500, count100: 85, count120: 655, count150: 356 },
+        subscriptions: { newCount: 123 },
+        annualFull: { total: 25, newCount: 9, renewCount: 16 },
+        annualLimited: { total: 10, newCount: 3, renewCount: 7 },
+        coachingRevenue: 961200,
+        coaching: { trialClasses: 5, newRevenue: 453600, renewRevenue: 507600 },
+        active: { subscriptions: 281, annualFull888: 285, annualFullLegacy788: 4, annualLimited788: 106, annualLimitedLegacy688: 2 }
+      }),
+      '2026-02': financeMonthSeed('2026-02', {
+        singleEntry: { people: 1192, revenue: 148170, count100: 60, count120: 853, count150: 279 },
+        subscriptions: { newCount: 151 },
+        annualFull: { total: 31, newCount: 18, renewCount: 13 },
+        annualLimited: { total: 11, newCount: 6, renewCount: 5 },
+        coachingRevenue: 836999,
+        coaching: { trialClasses: 7, newRevenue: 187799, renewRevenue: 649200 },
+        active: { subscriptions: 338, annualFull888: 293, annualFullLegacy788: 3, annualLimited788: 111, annualLimitedLegacy688: 0 }
+      }),
+      '2026-03': financeMonthSeed('2026-03', {
+        singleEntry: { people: 1630, revenue: 211150, count100: 73, count120: 990, count150: 567 },
+        subscriptions: { newCount: 175 },
+        annualFull: { total: 34, newCount: 21, renewCount: 13 },
+        annualLimited: { total: 20, newCount: 12, renewCount: 8 },
+        coachingRevenue: 1016400,
+        coaching: { trialClasses: 10, newRevenue: 846000, renewRevenue: 170400 },
+        active: { subscriptions: 375, annualFull888: 296, annualFullLegacy788: 3, annualLimited788: 121, annualLimitedLegacy688: 0 }
+      }),
+      '2026-04': financeMonthSeed('2026-04', {
+        singleEntry: { people: 1673, revenue: 216210, count100: 84, count120: 1018, count150: 571 },
+        subscriptions: { newCount: 196 },
+        annualFull: { total: 33, newCount: 17, renewCount: 16 },
+        annualLimited: { total: 14, newCount: 9, renewCount: 5 },
+        coachingRevenue: 832800,
+        coaching: { trialClasses: 6, newRevenue: 381600, renewRevenue: 451200 },
+        active: { subscriptions: 414, annualFull888: 306, annualFullLegacy788: 3, annualLimited788: 125, annualLimitedLegacy688: 0 }
+      }),
+      '2026-05': financeMonthSeed('2026-05', {
+        singleEntry: { people: 1812, revenue: 234610, count100: 79, count120: 1108, count150: 625 },
+        subscriptions: { newCount: 191 },
+        annualFull: { total: 19, newCount: 8, renewCount: 11 },
+        annualLimited: { total: 6, newCount: 4, renewCount: 2 },
+        coachingRevenue: 804000,
+        coaching: { trialClasses: 9, newRevenue: 291600, renewRevenue: 512400 },
+        active: { subscriptions: 392, annualFull888: 304, annualFullLegacy788: 2, annualLimited788: 125, annualLimitedLegacy688: 0 }
+      }),
+      '2026-06': financeMonthSeed('2026-06', {
+        singleEntry: { people: 1497, revenue: 192520, count100: 82, count120: 931, count150: 484 },
+        subscriptions: { newCount: 167 },
+        annualFull: { total: 23, newCount: 13, renewCount: 10 },
+        annualLimited: { total: 14, newCount: 7, renewCount: 7 },
+        coachingRevenue: 1004100,
+        coaching: { trialClasses: 5, newRevenue: 446400, renewRevenue: 557700 },
+        active: { subscriptions: 372, annualFull888: 311, annualFullLegacy788: 1, annualLimited788: 125, annualLimitedLegacy688: 0 }
+      })
+    };
+    const historicalCoachSeries = {
+      'coach-wally': { name: '潘威倫 Wally', revenue: [441600,224997,166199,196800,98999,231300], sessions: [77,51,90,88,81,75], attendance: [32,35,36,37,40,42], trialClasses: [5,3,3,3,0,0] },
+      'coach-timmy': { name: '洪錦廷 Timmy', revenue: [119998,125399,118798,207600,124800,93600], sessions: [102,62,105,101,110,81], attendance: [42,41,42,43,46,48], trialClasses: [1,0,2,0,1,0] },
+      'coach-nomi': { name: '簡文蕙 Nomi', revenue: [62999,125399,148199,62999,155998,187200], sessions: [90,68,101,85,91,101], attendance: [40,41,41,43,46,49], trialClasses: [1,1,3,1,2,2] },
+      'coach-tifa': { name: '李佳恩 Tifa', revenue: [175799,156000,212997,119399,164997,63598], sessions: [109,81,109,110,113,107], attendance: [52,53,52,53,54,55], trialClasses: [2,1,3,1,3,0] },
+      'coach-bryant': { name: '黃泊瑜 Bryant', revenue: [81600,130199,81600,149399,145200,197399], sessions: [86,83,108,94,86,103], attendance: [40,42,44,46,48,50], trialClasses: [1,0,2,2,2,2] },
+      'coach-jerry': { name: '楊治傑 Jerry', revenue: [82199,79198,275397,98999,119397,98400], sessions: [96,75,100,118,108,105], attendance: [45,46,38,41,48,49], trialClasses: [1,1,6,1,1,1] },
+      'coach-henry': { name: '林泓旭 Henry', revenue: [0,0,0,0,0,135598], sessions: [0,0,0,0,0,7], attendance: [0,0,0,0,0,3], trialClasses: [0,0,0,0,0,7] }
+    };
+    ['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06'].forEach((period, monthIndex) => {
+      Object.entries(historicalCoachSeries).forEach(([id, coach]) => {
+        historicalFinanceMonths[period].coaches[id] = {
+          name: coach.name,
+          revenue: coach.revenue[monthIndex],
+          sessions: coach.sessions[monthIndex],
+          attendance: coach.attendance[monthIndex],
+          trialClasses: coach.trialClasses[monthIndex]
+        };
+      });
+    });
     const cloneData = (value) => {
       if (typeof structuredClone === 'function') return structuredClone(value);
       return JSON.parse(JSON.stringify(value));
@@ -402,7 +650,19 @@
       filter: 'all',
       personFilter: [],
       editingEmployee: null,
-      selected: null
+      selected: null,
+      adminAuthenticated: false,
+      managerUser: null,
+      financeSection: 'overview',
+      financeSelectedPeriod: '2026-06',
+      financeCoachId: 'coach-wally',
+      financeMonths: {},
+      financeLoaded: false,
+      financeLoading: false,
+      financeError: '',
+      financeStatus: '',
+      financeImport: null,
+      financeCharts: []
     };
 
     function load() {
@@ -742,6 +1002,420 @@
       const summary = document.getElementById('requestSelectedSummary');
       if (summary) summary.textContent = selectedDatesText();
     }
+    const financeStoreFieldGroups = [
+      { title: '單次入場', fields: [
+        ['store.singleEntry.people', '總人數'], ['store.singleEntry.revenue', '總金額'],
+        ['store.singleEntry.count100', '100 元人次'], ['store.singleEntry.count120', '120 元人次'], ['store.singleEntry.count150', '150 元人次']
+      ]},
+      { title: '訂閱與年約', fields: [
+        ['store.subscriptions.newCount', '訂閱人數'],
+        ['store.annualFull.total', '全時段總數'], ['store.annualFull.newCount', '全時段新客'], ['store.annualFull.renewCount', '全時段續約'],
+        ['store.annualLimited.total', '限時段總數'], ['store.annualLimited.newCount', '限時段新客'], ['store.annualLimited.renewCount', '限時段續約']
+      ]},
+      { title: '教練課', fields: [
+        ['store.coaching.totalRevenue', '教練課總業績'], ['store.coaching.trialClasses', '體驗課'],
+        ['store.coaching.newRevenue', '新客業績'], ['store.coaching.renewRevenue', '續約業績']
+      ]},
+      { title: '目前有效人數', fields: [
+        ['store.active.subscriptions', '訂閱有效'], ['store.active.annualFull888', '全時段 888'],
+        ['store.active.annualFullLegacy788', '舊全時段 788'], ['store.active.annualLimited788', '限時段 788'],
+        ['store.active.annualLimitedLegacy688', '舊限時段 688']
+      ]}
+    ];
+    const financeCsvStoreHeaders = ['period','singleEntryPeople','singleEntryRevenue','count100','count120','count150','subscriptionNew','annualFullTotal','annualFullNew','annualFullRenew','annualLimitedTotal','annualLimitedNew','annualLimitedRenew','coachingRevenue','trialClasses','coachingNewRevenue','coachingRenewRevenue','activeSubscriptions','activeAnnualFull888','activeAnnualFullLegacy788','activeAnnualLimited788','activeAnnualLimitedLegacy688'];
+    const financeCsvCoachHeaders = ['period','employeeId','coachName','revenue','sessions','attendance','trialClasses'];
+    function financeNumber(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+    function financeFormat(value, money = false) {
+      const number = financeNumber(value);
+      return `${money ? '$' : ''}${number.toLocaleString('zh-TW')}`;
+    }
+    function financeGet(object, path) {
+      return path.split('.').reduce((value, key) => value?.[key], object);
+    }
+    function financeSet(object, path, value) {
+      const keys = path.split('.');
+      let current = object;
+      keys.slice(0, -1).forEach(key => {
+        if (!current[key] || typeof current[key] !== 'object') current[key] = {};
+        current = current[key];
+      });
+      current[keys[keys.length - 1]] = value;
+    }
+    function financePeriods() {
+      return Object.keys(state.financeMonths).sort();
+    }
+    function financeCurrent(period = state.financeSelectedPeriod) {
+      return state.financeMonths[period] || financeMonthSeed(period || formatMonth(new Date()));
+    }
+    function financePrevious(period = state.financeSelectedPeriod) {
+      const periods = financePeriods();
+      const index = periods.indexOf(period);
+      return index > 0 ? state.financeMonths[periods[index - 1]] : null;
+    }
+    function financeDelta(value, previousValue) {
+      const delta = financeNumber(value) - financeNumber(previousValue);
+      const css = delta > 0 ? 'up' : delta < 0 ? 'down' : '';
+      const prefix = delta > 0 ? '+' : '';
+      return `<span class="finance-delta ${css}">${prefix}${delta.toLocaleString('zh-TW')}</span>`;
+    }
+    function financeCoachKey(employee) {
+      const name = String(employee?.name || '').toLowerCase();
+      const aliases = { wally: 'coach-wally', timmy: 'coach-timmy', nomi: 'coach-nomi', tifa: 'coach-tifa', bryant: 'coach-bryant', jerry: 'coach-jerry', henry: 'coach-henry' };
+      const alias = Object.keys(aliases).find(item => name.includes(item));
+      return alias ? aliases[alias] : employee?.id;
+    }
+    function financeCoachDirectory() {
+      const directory = new Map(Object.entries(historicalCoachSeries).map(([id, coach]) => [id, { id, name: coach.name }]));
+      sortEmployees(state.employees.filter(emp => employeeGroup(emp) === 'coach')).forEach(emp => {
+        const id = financeCoachKey(emp);
+        directory.set(id, { id, name: emp.name, employeeId: emp.id });
+      });
+      Object.values(state.financeMonths).forEach(month => {
+        Object.entries(month.coaches || {}).forEach(([id, coach]) => {
+          if (!directory.has(id)) directory.set(id, { id, name: coach.name || id });
+        });
+      });
+      return [...directory.values()];
+    }
+    function financeMonthOptions() {
+      return financePeriods().map(period => `<option value="${period}">${period.replace('-', ' 年 ')} 月</option>`).join('');
+    }
+    function financeStatus(message, isError = false) {
+      state.financeStatus = message;
+      state.financeError = isError ? message : '';
+      if (state.tab === 'finance') render();
+    }
+    async function ensureFinanceLoaded() {
+      if (!state.adminAuthenticated || state.financeLoaded || state.financeLoading) return;
+      state.financeLoading = true;
+      state.financeError = '';
+      if (state.tab === 'finance') render();
+      try {
+        if (!window.loadFinanceMonthsFromCloud || !window.saveFinanceMonthToCloud) throw new Error('Firebase 財報服務尚未完成載入');
+        const cloudRows = await window.loadFinanceMonthsFromCloud();
+        const cloud = Object.fromEntries((cloudRows || []).map(row => [row.period, row]));
+        const missing = Object.entries(historicalFinanceMonths).filter(([period]) => !cloud[period]);
+        for (const [period, data] of missing) {
+          await window.saveFinanceMonthToCloud(period, cloneData(data));
+        }
+        state.financeMonths = { ...cloneData(historicalFinanceMonths), ...cloneData(cloud) };
+        state.financeLoaded = true;
+        const periods = financePeriods();
+        if (!state.financeMonths[state.financeSelectedPeriod]) state.financeSelectedPeriod = periods[periods.length - 1] || '2026-06';
+        state.financeStatus = missing.length ? `已建立 ${missing.length} 個月的簡報歷史資料` : '財報已從雲端同步';
+      } catch (error) {
+        console.error('Finance load failed:', error);
+        state.financeError = error.message || '財報讀取失敗';
+      } finally {
+        state.financeLoading = false;
+        if (state.tab === 'finance') render();
+      }
+    }
+    async function saveFinanceRecord(period, record) {
+      if (!state.adminAuthenticated) throw new Error('主管驗證已失效，請重新登入');
+      if (!window.saveFinanceMonthToCloud) throw new Error('Firebase 財報服務尚未完成載入');
+      const clean = cloneData({ ...record, period, source: record.source || 'IGYM finance dashboard' });
+      await window.saveFinanceMonthToCloud(period, clean);
+      state.financeMonths[period] = clean;
+      state.financeSelectedPeriod = period;
+      state.financeLoaded = true;
+      return clean;
+    }
+    function financeMetricRows(current, previous) {
+      const groups = [
+        ['單次入場', [
+          ['總人數', 'store.singleEntry.people', false], ['總金額', 'store.singleEntry.revenue', true],
+          ['100 元人次', 'store.singleEntry.count100', false], ['120 元人次', 'store.singleEntry.count120', false], ['150 元人次', 'store.singleEntry.count150', false]
+        ]],
+        ['訂閱與年約', [
+          ['訂閱人數', 'store.subscriptions.newCount', false], ['全時段總數', 'store.annualFull.total', false],
+          ['全時段新客', 'store.annualFull.newCount', false], ['全時段續約', 'store.annualFull.renewCount', false],
+          ['限時段總數', 'store.annualLimited.total', false], ['限時段新客', 'store.annualLimited.newCount', false], ['限時段續約', 'store.annualLimited.renewCount', false]
+        ]],
+        ['教練課', [
+          ['教練課總業績', 'store.coaching.totalRevenue', true], ['體驗課', 'store.coaching.trialClasses', false],
+          ['新客業績', 'store.coaching.newRevenue', true], ['續約業績', 'store.coaching.renewRevenue', true]
+        ]]
+      ];
+      return groups.map(([title, rows]) => `<tr class="section-row"><td colspan="3">${title}</td></tr>${rows.map(([label, path, money]) => {
+        const value = financeGet(current, path);
+        const previousValue = financeGet(previous, path);
+        return `<tr><td>${label}</td><td class="finance-number">${financeFormat(value, money)}</td><td>${financeDelta(value, previousValue)}</td></tr>`;
+      }).join('')}`).join('');
+    }
+    function renderFinanceOverview(current, previous) {
+      const kpis = [
+        ['單次入場人數', 'store.singleEntry.people', false], ['單次入場收入', 'store.singleEntry.revenue', true],
+        ['本月訂閱人數', 'store.subscriptions.newCount', false], ['教練課總業績', 'store.coaching.totalRevenue', true]
+      ];
+      return `
+        <div class="finance-kpis">${kpis.map(([label, path, money]) => {
+          const value = financeGet(current, path);
+          return `<article class="finance-kpi"><span class="finance-kpi-label">${label}</span><strong class="finance-kpi-value">${financeFormat(value, money)}</strong>${financeDelta(value, financeGet(previous, path))}</article>`;
+        }).join('')}</div>
+        <div class="finance-grid">
+          <article class="finance-card"><h3>營運績效總覽</h3><p class="finance-card-note">差異由目前月份與上一個月份自動計算</p><div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>項目</th><th>本月</th><th>月差異</th></tr></thead><tbody>${financeMetricRows(current, previous)}</tbody></table></div></article>
+          <article class="finance-card"><h3>營收組成趨勢</h3><p class="finance-card-note">單次入場與教練課業績</p><div class="chart-box"><canvas id="financeRevenueChart"></canvas></div></article>
+        </div>`;
+    }
+    function renderFinanceMembers(current, previous) {
+      const metrics = [
+        ['訂閱有效', 'subscriptions'], ['全時段 888', 'annualFull888'], ['舊全時段 788', 'annualFullLegacy788'],
+        ['限時段 788', 'annualLimited788'], ['舊限時段 688', 'annualLimitedLegacy688']
+      ];
+      return `<div class="finance-grid">
+        <article class="finance-card"><h3>目前有效人數總合</h3><p class="finance-card-note">會員方案現有有效人數</p><div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>方案</th><th>本月</th><th>月差異</th></tr></thead><tbody>${metrics.map(([label, key]) => `<tr><td>${label}</td><td class="finance-number">${financeFormat(current.store.active[key])}</td><td>${financeDelta(current.store.active[key], previous?.store?.active?.[key])}</td></tr>`).join('')}</tbody></table></div></article>
+        <article class="finance-card"><h3>有效會員變動</h3><p class="finance-card-note">2026 年 1 月起各方案走勢</p><div class="chart-box"><canvas id="financeMembersChart"></canvas></div></article>
+      </div>`;
+    }
+    function renderFinanceTrend() {
+      const periods = financePeriods().filter(period => period >= '2025-06' && period <= '2026-06');
+      return `<article class="finance-card"><h3>近 13 個月教練課營收變動趨勢</h3><p class="finance-card-note">2025 年 6 月至 2026 年 6 月</p><div class="chart-box"><canvas id="financeTrendChart"></canvas></div><div class="trend-values">${periods.map(period => `<div class="trend-point" data-trend-point="${period}"><span>${period.slice(2).replace('-', '/')}</span><strong>${financeFormat(state.financeMonths[period]?.store?.coaching?.totalRevenue, true)}</strong></div>`).join('')}</div></article>`;
+    }
+    function coachLatestStats(coachId, preferredPeriod) {
+      const preferred = state.financeMonths[preferredPeriod]?.coaches?.[coachId];
+      if (preferred) return { period: preferredPeriod, ...preferred };
+      const period = [...financePeriods()].reverse().find(key => state.financeMonths[key]?.coaches?.[coachId]);
+      return { period: period || preferredPeriod, ...(state.financeMonths[period]?.coaches?.[coachId] || {}) };
+    }
+    function renderFinanceCoaches() {
+      const directory = financeCoachDirectory();
+      if (!directory.some(coach => coach.id === state.financeCoachId)) state.financeCoachId = directory[0]?.id || '';
+      const mobile = isMobileView() || isLandscapeMobileView();
+      const shown = mobile ? directory.filter(coach => coach.id === state.financeCoachId) : directory;
+      return `<div class="coach-toolbar"><div><strong>教練績效</strong><div class="finance-card-note" style="margin:3px 0 0">業績、操課、學員人數與體驗課</div></div><select data-action="financeCoachSelect">${directory.map(coach => `<option value="${escapeHtml(coach.id)}" ${coach.id === state.financeCoachId ? 'selected' : ''}>${escapeHtml(coach.name)}</option>`).join('')}</select></div>
+        <div class="coach-performance-grid">${shown.map(coach => {
+          const stats = coachLatestStats(coach.id, state.financeSelectedPeriod);
+          return `<article class="finance-card coach-performance-card" data-coach-id="${escapeHtml(coach.id)}"><h3>${escapeHtml(coach.name)}</h3><p class="finance-card-note">${escapeHtml(stats.period || state.financeSelectedPeriod)} 績效</p><div class="coach-stats">
+            <div class="coach-stat"><span>總業績</span><strong>${financeFormat(stats.revenue, true)}</strong></div><div class="coach-stat"><span>總操課</span><strong>${financeFormat(stats.sessions)}</strong></div><div class="coach-stat"><span>學員人數</span><strong>${financeFormat(stats.attendance)}</strong></div><div class="coach-stat"><span>體驗課</span><strong>${financeFormat(stats.trialClasses)}</strong></div>
+          </div><div class="chart-box"><canvas data-coach-chart="${escapeHtml(coach.id)}"></canvas></div></article>`;
+        }).join('')}</div>`;
+    }
+    function financeFieldHtml(path, label, record) {
+      return `<label class="finance-field">${label}<input type="number" min="0" step="1" value="${financeNumber(financeGet(record, path))}" data-finance-field="${path}" /></label>`;
+    }
+    function renderFinanceImportPreview() {
+      const preview = state.financeImport;
+      if (!preview) return '';
+      if (preview.errors.length) return `<div class="finance-import-preview error"><strong>匯入檔有 ${preview.errors.length} 個問題</strong><div style="margin-top:6px;font-size:12px">${preview.errors.slice(0, 8).map(item => escapeHtml(item)).join('<br>')}</div><div class="finance-actions" style="margin-top:10px"><button class="secondary" data-action="clearFinanceImport">清除</button></div></div>`;
+      const columns = Object.keys(preview.rows[0] || {}).slice(0, 7);
+      return `<div class="finance-import-preview"><strong>${escapeHtml(preview.fileName)}：${preview.rows.length} 筆資料可匯入</strong><div class="finance-table-wrap" style="margin-top:8px"><table class="finance-table"><thead><tr>${columns.map(key => `<th>${escapeHtml(key)}</th>`).join('')}</tr></thead><tbody>${preview.rows.slice(0, 6).map(row => `<tr>${columns.map(key => `<td>${escapeHtml(String(row[key] ?? ''))}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="finance-actions" style="margin-top:10px"><button class="secondary" data-action="clearFinanceImport">取消</button><button class="primary" data-action="applyFinanceImport">確認匯入</button></div></div>`;
+    }
+    function renderFinanceManage(record) {
+      const coaches = financeCoachDirectory();
+      return `<div class="finance-form">
+        <section class="finance-form-section"><div class="finance-head"><div><h3>月份資料</h3><p class="finance-card-note">儲存後會直接更新 Firestore</p></div><div class="finance-month-control"><label for="financePeriod">月份</label><input id="financePeriod" type="month" value="${state.financeSelectedPeriod}" /></div></div></section>
+        ${financeStoreFieldGroups.map(group => `<section class="finance-form-section"><h3>${group.title}</h3><div class="finance-fields">${group.fields.map(([path, label]) => financeFieldHtml(path, label, record)).join('')}</div></section>`).join('')}
+        <section class="finance-form-section"><h3>教練績效</h3>${coaches.map(coach => {
+          const values = record.coaches?.[coach.id] || {};
+          return `<div class="finance-coach-row" data-finance-coach="${escapeHtml(coach.id)}"><div class="finance-coach-name">${escapeHtml(coach.name)}</div>${[['revenue','總業績'],['sessions','總操課'],['attendance','學員人數'],['trialClasses','體驗課']].map(([key,label]) => `<label class="finance-field">${label}<input type="number" min="0" step="1" value="${financeNumber(values[key])}" data-finance-coach-field="${key}" /></label>`).join('')}</div>`;
+        }).join('')}</section>
+        <div class="finance-actions"><button class="primary" data-action="saveFinanceMonth">儲存本月財報</button></div>
+        <section class="finance-form-section"><h3>CSV 匯入</h3><p class="finance-card-note">匯入前會先顯示預覽，不會直接覆蓋資料</p><div class="finance-imports">
+          <label class="finance-drop"><strong>store_metrics.csv</strong><small>${financeCsvStoreHeaders.join(', ')}</small><input id="financeStoreCsv" type="file" accept=".csv,text/csv" /></label>
+          <label class="finance-drop"><strong>coach_metrics.csv</strong><small>${financeCsvCoachHeaders.join(', ')}</small><input id="financeCoachCsv" type="file" accept=".csv,text/csv" /></label>
+        </div></section>
+        ${renderFinanceImportPreview()}
+      </div>`;
+    }
+    function clearFinanceCharts() {
+      state.financeCharts.forEach(chart => { try { chart.destroy(); } catch {} });
+      state.financeCharts = [];
+    }
+    function financeFallbackChart(canvas, labels, values) {
+      if (!canvas) return;
+      canvas.style.display = 'none';
+      const max = Math.max(...values.map(financeNumber), 1);
+      const fallback = document.createElement('div');
+      fallback.className = 'fallback-chart';
+      fallback.innerHTML = values.map((value, index) => `<div class="fallback-bar" style="height:${Math.max(3, financeNumber(value) / max * 100)}%" title="${financeFormat(value)}"><span>${escapeHtml(labels[index] || '')}</span></div>`).join('');
+      canvas.parentElement.appendChild(fallback);
+    }
+    function createFinanceChart(canvas, config, fallbackLabels, fallbackValues) {
+      if (!canvas) return;
+      if (!window.Chart) return financeFallbackChart(canvas, fallbackLabels, fallbackValues);
+      state.financeCharts.push(new window.Chart(canvas, config));
+    }
+    function renderFinanceCharts() {
+      clearFinanceCharts();
+      const periods = financePeriods();
+      const labels = periods.map(period => period.slice(2).replace('-', '/'));
+      const baseOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { boxWidth: 12, font: { size: 10 } } } }, scales: { y: { beginAtZero: true } } };
+      if (state.financeSection === 'overview') {
+        const coaching = periods.map(period => financeNumber(state.financeMonths[period]?.store?.coaching?.totalRevenue));
+        const single = periods.map(period => financeNumber(state.financeMonths[period]?.store?.singleEntry?.revenue));
+        createFinanceChart(document.getElementById('financeRevenueChart'), { type: 'line', data: { labels, datasets: [{ label: '教練課業績', data: coaching, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,.12)', tension: .25, fill: true }, { label: '單次入場收入', data: single, borderColor: '#0f766e', backgroundColor: 'transparent', tension: .25 }] }, options: baseOptions }, labels, coaching);
+      }
+      if (state.financeSection === 'members') {
+        const memberPeriods = periods.filter(period => period >= '2026-01');
+        const memberLabels = memberPeriods.map(period => period.slice(2).replace('-', '/'));
+        const series = [['訂閱','subscriptions','#4f46e5'],['全時段 888','annualFull888','#0f766e'],['限時段 788','annualLimited788','#d97706']];
+        createFinanceChart(document.getElementById('financeMembersChart'), { type: 'line', data: { labels: memberLabels, datasets: series.map(([label,key,color]) => ({ label, data: memberPeriods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.[key])), borderColor: color, tension: .25 })) }, options: baseOptions }, memberLabels, memberPeriods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.subscriptions)));
+      }
+      if (state.financeSection === 'trend') {
+        const trendPeriods = periods.filter(period => period >= '2025-06' && period <= '2026-06');
+        const trendLabels = trendPeriods.map(period => period.slice(2).replace('-', '/'));
+        const values = trendPeriods.map(period => financeNumber(state.financeMonths[period]?.store?.coaching?.totalRevenue));
+        createFinanceChart(document.getElementById('financeTrendChart'), { type: 'bar', data: { labels: trendLabels, datasets: [{ label: '教練課總業績', data: values, backgroundColor: '#6366f1', borderRadius: 4 }] }, options: baseOptions }, trendLabels, values);
+      }
+      if (state.financeSection === 'coaches') {
+        document.querySelectorAll('[data-coach-chart]').forEach(canvas => {
+          const coachId = canvas.dataset.coachChart;
+          const coachPeriods = periods.filter(period => state.financeMonths[period]?.coaches?.[coachId]);
+          const coachLabels = coachPeriods.map(period => period.slice(2).replace('-', '/'));
+          const revenue = coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId].revenue));
+          createFinanceChart(canvas, { type: 'bar', data: { labels: coachLabels, datasets: [
+            { label: '總業績', data: revenue, backgroundColor: '#4f46e5', yAxisID: 'y' },
+            { type: 'line', label: '總操課', data: coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId].sessions)), borderColor: '#0f766e', yAxisID: 'y1', tension: .2 },
+            { type: 'line', label: '學員人數', data: coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId].attendance)), borderColor: '#d97706', yAxisID: 'y1', tension: .2 },
+            { type: 'line', label: '體驗課', data: coachPeriods.map(period => financeNumber(state.financeMonths[period].coaches[coachId].trialClasses)), borderColor: '#dc2626', yAxisID: 'y1', tension: .2 }
+          ] }, options: { ...baseOptions, scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } } } } }, coachLabels, revenue);
+        });
+      }
+    }
+    function renderFinance() {
+      if (!state.adminAuthenticated || state.view !== 'admin') {
+        state.tab = 'weekly';
+        renderWeekly();
+        return;
+      }
+      if (!state.financeLoaded) {
+        layout(`<section class="panel"><div class="finance-panel"><div class="finance-dashboard"><div class="finance-status ${state.financeError ? 'error' : ''}">${escapeHtml(state.financeError || '正在連線主管財報...')}</div></div></div></section>`);
+        if (!state.financeLoading && !state.financeError) setTimeout(ensureFinanceLoaded, 0);
+        return;
+      }
+      const current = financeCurrent();
+      const previous = financePrevious();
+      const sectionContent = state.financeSection === 'members' ? renderFinanceMembers(current, previous)
+        : state.financeSection === 'trend' ? renderFinanceTrend()
+        : state.financeSection === 'coaches' ? renderFinanceCoaches()
+        : state.financeSection === 'manage' ? renderFinanceManage(current)
+        : renderFinanceOverview(current, previous);
+      layout(`<section class="panel"><div class="finance-panel"><div class="finance-dashboard">
+        <div class="finance-head"><div class="finance-title"><h2>IGYM 營運財報</h2><p>主管專用 · 雲端同步</p></div><div class="finance-month-control"><label>查看月份</label><select data-action="financePeriodSelect">${financeMonthOptions()}</select></div></div>
+        <div class="finance-tabs">
+          <button class="finance-tab ${state.financeSection === 'overview' ? 'active' : ''}" data-finance-section="overview">營運總覽</button>
+          <button class="finance-tab ${state.financeSection === 'members' ? 'active' : ''}" data-finance-section="members">有效會員</button>
+          <button class="finance-tab ${state.financeSection === 'trend' ? 'active' : ''}" data-finance-section="trend">13 月趨勢</button>
+          <button class="finance-tab ${state.financeSection === 'coaches' ? 'active' : ''}" data-finance-section="coaches">教練績效</button>
+          <button class="finance-tab ${state.financeSection === 'manage' ? 'active' : ''}" data-finance-section="manage">資料管理</button>
+        </div>
+        ${state.financeStatus ? `<div class="finance-status ${state.financeError ? 'error' : ''}">${escapeHtml(state.financeStatus)}</div>` : ''}
+        ${sectionContent}
+      </div></div></section>`);
+      const selector = document.querySelector('[data-action="financePeriodSelect"]');
+      if (selector) selector.value = state.financeSelectedPeriod;
+      setTimeout(renderFinanceCharts, 0);
+    }
+    function parseCsvRows(text) {
+      const rows = [];
+      let row = [], cell = '', quoted = false;
+      const source = String(text || '').replace(/^\uFEFF/, '');
+      for (let index = 0; index < source.length; index += 1) {
+        const char = source[index];
+        if (char === '"' && quoted && source[index + 1] === '"') { cell += '"'; index += 1; }
+        else if (char === '"') quoted = !quoted;
+        else if (char === ',' && !quoted) { row.push(cell.trim()); cell = ''; }
+        else if ((char === '\n' || char === '\r') && !quoted) {
+          if (char === '\r' && source[index + 1] === '\n') index += 1;
+          row.push(cell.trim()); cell = '';
+          if (row.some(value => value !== '')) rows.push(row);
+          row = [];
+        } else cell += char;
+      }
+      row.push(cell.trim());
+      if (row.some(value => value !== '')) rows.push(row);
+      return rows;
+    }
+    function parseFinanceCsv(text, type) {
+      const table = parseCsvRows(text);
+      const expected = type === 'store' ? financeCsvStoreHeaders : financeCsvCoachHeaders;
+      const headers = table.shift() || [];
+      const errors = [];
+      expected.forEach(header => { if (!headers.includes(header)) errors.push(`缺少欄位：${header}`); });
+      const rows = table.map((cells, rowIndex) => Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? ''])));
+      rows.forEach((row, index) => {
+        const line = index + 2;
+        if (!/^\d{4}-\d{2}$/.test(row.period || '')) errors.push(`第 ${line} 列月份格式應為 YYYY-MM`);
+        if (type === 'coach' && !(row.employeeId || row.coachName)) errors.push(`第 ${line} 列需要 employeeId 或 coachName`);
+        expected.filter(header => !['period','employeeId','coachName'].includes(header)).forEach(header => {
+          const value = Number(row[header]);
+          if (!Number.isFinite(value) || value < 0) errors.push(`第 ${line} 列 ${header} 必須是 0 以上的數字`);
+          else row[header] = value;
+        });
+      });
+      return { type, rows, errors };
+    }
+    async function handleFinanceCsvFile(file, type) {
+      if (!file) return;
+      try {
+        const parsed = parseFinanceCsv(await file.text(), type);
+        state.financeImport = { ...parsed, fileName: file.name };
+      } catch (error) {
+        state.financeImport = { type, rows: [], errors: [error.message || 'CSV 無法讀取'], fileName: file.name };
+      }
+      render();
+    }
+    function storeCsvRecord(row, existing) {
+      const record = cloneData(existing || financeMonthSeed(row.period));
+      record.period = row.period;
+      record.store = {
+        singleEntry: { people: row.singleEntryPeople, revenue: row.singleEntryRevenue, count100: row.count100, count120: row.count120, count150: row.count150 },
+        subscriptions: { newCount: row.subscriptionNew },
+        annualFull: { total: row.annualFullTotal, newCount: row.annualFullNew, renewCount: row.annualFullRenew },
+        annualLimited: { total: row.annualLimitedTotal, newCount: row.annualLimitedNew, renewCount: row.annualLimitedRenew },
+        coaching: { totalRevenue: row.coachingRevenue, trialClasses: row.trialClasses, newRevenue: row.coachingNewRevenue, renewRevenue: row.coachingRenewRevenue },
+        active: { subscriptions: row.activeSubscriptions, annualFull888: row.activeAnnualFull888, annualFullLegacy788: row.activeAnnualFullLegacy788, annualLimited788: row.activeAnnualLimited788, annualLimitedLegacy688: row.activeAnnualLimitedLegacy688 }
+      };
+      record.source = 'store_metrics.csv';
+      return record;
+    }
+    async function applyFinanceImport() {
+      const preview = state.financeImport;
+      if (!preview || preview.errors.length) return;
+      const updates = new Map();
+      preview.rows.forEach(row => {
+        const existing = updates.get(row.period) || state.financeMonths[row.period] || financeMonthSeed(row.period);
+        if (preview.type === 'store') updates.set(row.period, storeCsvRecord(row, existing));
+        else {
+          const record = cloneData(existing);
+          const id = row.employeeId || `finance-${String(row.coachName).trim().toLowerCase().replace(/\s+/g, '-')}`;
+          record.coaches ||= {};
+          record.coaches[id] = { name: row.coachName || financeCoachDirectory().find(item => item.id === id)?.name || id, revenue: row.revenue, sessions: row.sessions, attendance: row.attendance, trialClasses: row.trialClasses };
+          record.source = 'coach_metrics.csv';
+          updates.set(row.period, record);
+        }
+      });
+      financeStatus(`正在匯入 ${preview.rows.length} 筆資料...`);
+      try {
+        for (const [period, record] of updates) await saveFinanceRecord(period, record);
+        state.financeImport = null;
+        state.financeStatus = `已匯入 ${preview.rows.length} 筆資料`;
+        render();
+      } catch (error) {
+        console.error('Finance CSV import failed:', error);
+        financeStatus(error.message || 'CSV 匯入失敗', true);
+      }
+    }
+    function collectFinanceMonthForm() {
+      const period = document.getElementById('financePeriod')?.value;
+      if (!/^\d{4}-\d{2}$/.test(period || '')) throw new Error('請選擇正確月份');
+      const record = cloneData(state.financeMonths[period] || financeMonthSeed(period));
+      document.querySelectorAll('[data-finance-field]').forEach(input => financeSet(record, input.dataset.financeField, financeNumber(input.value)));
+      record.coaches ||= {};
+      document.querySelectorAll('[data-finance-coach]').forEach(row => {
+        const id = row.dataset.financeCoach;
+        const directory = financeCoachDirectory().find(item => item.id === id);
+        const values = { name: directory?.name || record.coaches[id]?.name || id };
+        row.querySelectorAll('[data-finance-coach-field]').forEach(input => { values[input.dataset.financeCoachField] = financeNumber(input.value); });
+        record.coaches[id] = values;
+      });
+      record.source = 'IGYM finance dashboard';
+      return { period, record };
+    }
     function layout(content) {
       document.getElementById('app').innerHTML = `
         <div class="app"><div class="shell ${state.topCollapsed ? 'top-collapsed' : ''}">
@@ -759,6 +1433,7 @@
               <button class="tab ${state.tab === 'daily' ? 'active' : ''}" data-tab="daily">每日時間軸</button>
               <button class="tab ${state.tab === 'requests' ? 'active' : ''}" data-tab="requests">${state.view === 'admin' ? '希望班' : '填希望班'}</button>
               ${state.view === 'admin' ? `<button class="tab ${state.tab === 'employees' ? 'active' : ''}" data-tab="employees">員工</button>` : ''}
+              ${state.view === 'admin' && state.adminAuthenticated ? `<button class="tab ${state.tab === 'finance' ? 'active' : ''}" data-tab="finance">財報</button>` : ''}
             </div>
           </nav>
           ${state.view === 'employee' ? '<div class="notice">目前是員工檢視模式，可以查看班表，也可以填寫希望班給主管參考。</div>' : ''}
@@ -771,26 +1446,59 @@
           <section class="login-card">
             <h1 style="text-align:center">FITNESS SCHEDULE</h1>
             <div class="subtitle" style="text-align:center">健身房排班系統 Pro</div>
-            <form id="loginForm">
-              <input id="password" type="password" placeholder="輸入密碼" autofocus />
-              <div class="error" id="loginError"></div>
-              <button class="primary" style="width:100%; padding:13px">登入</button>
+            <form id="managerLoginForm" class="login-section">
+              <h2>主管登入</h2>
+              <input id="managerEmail" type="email" autocomplete="username" placeholder="主管 Email" required autofocus />
+              <input id="managerPassword" class="password-input" type="password" autocomplete="current-password" placeholder="Firebase 密碼" required />
+              <div class="error" id="managerLoginError"></div>
+              <button class="primary" type="submit" style="width:100%; padding:13px">主管登入</button>
             </form>
-            <div class="hint">
-              <div>員工檢視：B12345</div>
-              <div>主管排班請輸入管理者密碼</div>
-            </div>
+            <div class="login-divider">或</div>
+            <form id="employeeLoginForm" class="login-section">
+              <h2>員工查看班表</h2>
+              <input id="employeePassword" class="password-input" type="password" placeholder="員工密碼" />
+              <div class="error" id="employeeLoginError"></div>
+              <button class="secondary" type="submit" style="width:100%; padding:13px">進入員工檢視</button>
+            </form>
+            <div class="hint">主管財報使用 Firebase 帳號保護；員工只能查看班表與填寫希望班。</div>
           </section>
         </div>`;
-      document.getElementById('loginForm').addEventListener('submit', event => {
+      document.getElementById('managerLoginForm').addEventListener('submit', async event => {
         event.preventDefault();
-        const pw = document.getElementById('password').value;
-        if (pw === 'A12345') state.view = 'admin';
-        else if (pw === 'B12345') state.view = 'employee';
-        else {
-          document.getElementById('loginError').textContent = '密碼錯誤，請重新輸入';
+        const email = document.getElementById('managerEmail').value.trim();
+        const password = document.getElementById('managerPassword').value;
+        const errorBox = document.getElementById('managerLoginError');
+        const button = event.submitter;
+        if (!window.signInFinanceManager) {
+          errorBox.textContent = 'Firebase 尚未完成載入，請稍後再試';
           return;
         }
+        try {
+          button.disabled = true;
+          errorBox.textContent = '正在驗證主管權限...';
+          const manager = await window.signInFinanceManager(email, password);
+          state.adminAuthenticated = true;
+          state.managerUser = manager;
+          state.view = 'admin';
+          state.tab = 'weekly';
+          render();
+        } catch (error) {
+          console.error('Manager sign-in failed:', error);
+          errorBox.textContent = error.message || '主管登入失敗，請檢查帳號與密碼';
+          button.disabled = false;
+        }
+      });
+      document.getElementById('employeeLoginForm').addEventListener('submit', event => {
+        event.preventDefault();
+        const password = document.getElementById('employeePassword').value;
+        if (password !== 'B12345') {
+          document.getElementById('employeeLoginError').textContent = '員工密碼錯誤，請重新輸入';
+          return;
+        }
+        state.adminAuthenticated = false;
+        state.managerUser = null;
+        state.view = 'employee';
+        state.tab = 'weekly';
         render();
       });
     }
@@ -1110,6 +1818,7 @@
       if (state.tab === 'daily') renderDaily();
       else if (state.tab === 'employees') renderEmployees();
       else if (state.tab === 'requests') renderRequests();
+      else if (state.tab === 'finance' && state.view === 'admin' && state.adminAuthenticated) renderFinance();
       else renderWeekly();
     }
     document.addEventListener('click', async event => {
@@ -1118,13 +1827,25 @@
         render();
         return;
       }
-      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-copy-date],[data-pick],[data-delete],[data-edit],[data-move],[data-person-filter],[data-request-delete],[data-request-date]');
+      const target = event.target.closest('[data-action],[data-tab],[data-quick],[data-date],[data-copy-date],[data-pick],[data-delete],[data-edit],[data-move],[data-person-filter],[data-request-delete],[data-request-date],[data-finance-section]');
       if (!target) {
         if (state.selected && event.target.closest('#picker .picker-card')) return;
         if (state.selected) { state.selected = null; render(); }
         return;
       }
-      if (target.dataset.tab) { state.tab = target.dataset.tab; render(); return; }
+      if (target.dataset.tab) {
+        if (target.dataset.tab === 'finance' && (!state.adminAuthenticated || state.view !== 'admin')) return;
+        state.tab = target.dataset.tab;
+        render();
+        return;
+      }
+      if (target.dataset.financeSection) {
+        state.financeSection = target.dataset.financeSection;
+        state.financeStatus = '';
+        state.financeError = '';
+        render();
+        return;
+      }
       if (target.dataset.personFilter) {
         const id = target.dataset.personFilter;
         const current = Array.isArray(state.personFilter) ? state.personFilter : [];
@@ -1222,7 +1943,22 @@
         return;
       }
       const action = target.dataset.action;
-      if (action === 'logout') { state.view = 'login'; state.tab = 'weekly'; state.quick = null; state.editingEmployee = null; render(); }
+      if (action === 'logout') {
+        if (state.adminAuthenticated && window.signOutFinanceManager) {
+          try { await window.signOutFinanceManager(); } catch (error) { console.warn('Manager sign-out failed:', error); }
+        }
+        clearFinanceCharts();
+        state.view = 'login';
+        state.tab = 'weekly';
+        state.quick = null;
+        state.editingEmployee = null;
+        state.adminAuthenticated = false;
+        state.managerUser = null;
+        state.financeLoaded = false;
+        state.financeMonths = {};
+        render();
+        return;
+      }
       if (action === 'closePicker') { state.selected = null; render(); return; }
       if (action === 'applyCellColor' && state.selected) {
         setCellColor(state.selected.date, state.selected.emp, document.getElementById('cellColorInput')?.value);
@@ -1271,6 +2007,23 @@
         return;
       }
       if (action === 'toggleAlerts') { state.alertsOpen = !state.alertsOpen; render(); return; }
+      if (action === 'saveFinanceMonth') {
+        try {
+          const { period, record } = collectFinanceMonthForm();
+          financeStatus('正在儲存本月財報...');
+          await saveFinanceRecord(period, record);
+          state.financeStatus = `${period} 財報已儲存`;
+          state.financeError = '';
+          showToast(`${period} 財報已儲存`);
+          render();
+        } catch (error) {
+          console.error('Finance month save failed:', error);
+          financeStatus(error.message || '財報儲存失敗', true);
+        }
+        return;
+      }
+      if (action === 'applyFinanceImport') { await applyFinanceImport(); return; }
+      if (action === 'clearFinanceImport') { state.financeImport = null; render(); return; }
       if (action === 'undo' && state.undo.length) { state.schedule = state.undo.shift(); save(); render(); }
       if (action === 'copyWeek') {
         const days = visibleScheduleDays();
@@ -1409,6 +2162,32 @@
         state.requestSelectedDates = [];
         render();
       }
+      if (event.target.dataset.action === 'financePeriodSelect') {
+        state.financeSelectedPeriod = event.target.value;
+        state.financeStatus = '';
+        state.financeError = '';
+        render();
+      }
+      if (event.target.dataset.action === 'financeCoachSelect') {
+        state.financeCoachId = event.target.value;
+        render();
+      }
+      if (event.target.id === 'financePeriod') {
+        const period = event.target.value;
+        if (/^\d{4}-\d{2}$/.test(period)) {
+          state.financeSelectedPeriod = period;
+          if (!state.financeMonths[period]) state.financeMonths[period] = financeMonthSeed(period);
+          render();
+        }
+      }
+      if (event.target.id === 'financeStoreCsv') {
+        handleFinanceCsvFile(event.target.files?.[0], 'store');
+        event.target.value = '';
+      }
+      if (event.target.id === 'financeCoachCsv') {
+        handleFinanceCsvFile(event.target.files?.[0], 'coach');
+        event.target.value = '';
+      }
       if (event.target.dataset.action === 'importDataFile') {
         importDataFile(event.target.files?.[0]);
         event.target.value = '';
@@ -1419,6 +2198,27 @@
       window.__scheduleResizeTimer = setTimeout(() => {
         if (state.view !== 'login') render();
       }, 160);
+    });
+    window.addEventListener('manager-auth-changed', event => {
+      const detail = event.detail || {};
+      if (detail.authenticated) {
+        state.adminAuthenticated = true;
+        state.managerUser = detail.user || null;
+        if (state.view === 'login') {
+          state.view = 'admin';
+          state.tab = 'weekly';
+        }
+        render();
+      } else if (state.view === 'admin') {
+        clearFinanceCharts();
+        state.adminAuthenticated = false;
+        state.managerUser = null;
+        state.financeLoaded = false;
+        state.financeMonths = {};
+        state.view = 'login';
+        state.tab = 'weekly';
+        render();
+      }
     });
     load();
     render();

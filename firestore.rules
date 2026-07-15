@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /finance_months/{period} {
+      allow read, write: if isAdmin();
+    }
+
+    // Keep the existing schedule sharing behavior unchanged.
+    match /schedules/{document} {
+      allow read, write: if true;
+    }
+
+    match /customer_inquiries/{document} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /logs/{document} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
