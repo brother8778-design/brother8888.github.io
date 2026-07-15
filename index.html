@@ -874,7 +874,6 @@
     const SCHEDULE_START = new Date(2026, 6, 6);
     const state = {
       view: 'login',
-      loginMode: 'manager',
       tab: 'weekly',
       baseDate: new Date(SCHEDULE_START),
       timelineDate: new Date(),
@@ -1891,9 +1890,8 @@
     }
     function renderLogin() {
       const verificationCooldown = ownerVerificationCooldownSeconds();
-      const loginMode = state.loginMode === 'employee' ? 'employee' : 'manager';
       document.getElementById('app').innerHTML = `
-        <div class="login" data-login-view="${loginMode}">
+        <div class="login" data-login-view="manager">
           <section class="login-card">
             <div class="login-brand">
               <span class="login-brand-mark">IGYM</span>
@@ -1901,27 +1899,24 @@
               <div class="subtitle">健身房排班系統 Pro</div>
             </div>
             <div class="login-mode-switch" role="tablist" aria-label="登入身分">
-              <button class="login-mode-button ${loginMode === 'manager' ? 'active' : ''}" type="button" role="tab" aria-selected="${loginMode === 'manager'}" data-login-mode="manager">主管登入</button>
-              <button class="login-mode-button ${loginMode === 'employee' ? 'active' : ''}" type="button" role="tab" aria-selected="${loginMode === 'employee'}" data-login-mode="employee">員工查看</button>
+              <button class="login-mode-button active" type="button" role="tab" aria-selected="true" data-login-mode="manager">主管登入</button>
+              <button class="login-mode-button" type="button" role="tab" aria-selected="false" data-login-mode="employee">員工查看</button>
             </div>
             <div class="login-stage">
-              <div class="login-panel" ${loginMode === 'manager' ? '' : 'hidden'}>
-                ${state.ownerVerificationPending ? `<div class="verification-box"><strong>Email 驗證連結已寄到 ${escapeHtml(state.ownerVerificationEmail || '主管信箱')}</strong><span>這不是數字驗證碼。請點開信件中的驗證連結，再回到這裡確認。</span><div class="verification-details">寄件者：<strong>noreply@igym-1fca5.firebaseapp.com</strong><br>標題：<strong>Verify your email for IGYM</strong><br>收件匣沒有時，請檢查垃圾郵件與促銷內容。</div><div class="verification-actions"><button class="primary" data-action="refreshOwnerVerification">我已完成 Email 驗證</button><button class="secondary" data-action="resendOwnerVerification" ${verificationCooldown ? 'disabled' : ''}>${verificationCooldown ? `${verificationCooldown} 秒後可重寄` : '重新寄送 Email 驗證連結'}</button><button class="secondary" data-action="cancelOwnerVerification">改用其他帳號</button></div></div>` : `<form id="managerLoginForm" class="login-section"><h2>使用主管 Email 與密碼登入</h2><input id="managerEmail" type="email" autocomplete="username" placeholder="主管 Email" required ${loginMode === 'manager' ? 'autofocus' : ''} /><input id="managerPassword" class="password-input" type="password" autocomplete="current-password" placeholder="密碼" required /><div class="error" id="managerLoginError"></div><button class="login-submit" type="submit">登入</button></form><details class="owner-setup"><summary>首次建立最高主管</summary><form id="ownerSetupForm" class="login-section"><input id="ownerDisplayName" autocomplete="name" placeholder="最高主管姓名" required /><input value="ed56671056@gmail.com" type="email" readonly aria-label="最高主管 Email" /><input id="ownerPassword" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="設定至少 6 碼密碼" required /><input id="ownerPasswordConfirm" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="再輸入一次密碼" required /><div class="error" id="ownerSetupError"></div><button class="login-submit" type="submit">建立帳號並寄送驗證信</button></form></details>`}
-              </div>
-              <div class="login-panel" ${loginMode === 'employee' ? '' : 'hidden'}>
-                <form id="employeeLoginForm" class="login-section">
-                  <h2>輸入員工密碼查看班表</h2>
-                  <input id="employeePassword" class="password-input" type="password" autocomplete="current-password" placeholder="員工密碼" ${loginMode === 'employee' ? 'autofocus' : ''} />
-                  <div class="error" id="employeeLoginError"></div>
-                  <button class="login-submit" type="submit">登入</button>
-                </form>
+              <div class="login-panel">
+                ${state.ownerVerificationPending ? `<div class="verification-box"><strong>Email 驗證連結已寄到 ${escapeHtml(state.ownerVerificationEmail || '主管信箱')}</strong><span>這不是數字驗證碼。請點開信件中的驗證連結，再回到這裡確認。</span><div class="verification-details">寄件者：<strong>noreply@igym-1fca5.firebaseapp.com</strong><br>標題：<strong>Verify your email for IGYM</strong><br>收件匣沒有時，請檢查垃圾郵件與促銷內容。</div><div class="verification-actions"><button class="primary" data-action="refreshOwnerVerification">我已完成 Email 驗證</button><button class="secondary" data-action="resendOwnerVerification" ${verificationCooldown ? 'disabled' : ''}>${verificationCooldown ? `${verificationCooldown} 秒後可重寄` : '重新寄送 Email 驗證連結'}</button><button class="secondary" data-action="cancelOwnerVerification">改用其他帳號</button></div></div>` : `<form id="managerLoginForm" class="login-section"><h2>使用主管 Email 與密碼登入</h2><input id="managerEmail" type="email" autocomplete="username" placeholder="主管 Email" required autofocus /><input id="managerPassword" class="password-input" type="password" autocomplete="current-password" placeholder="密碼" required /><div class="error" id="managerLoginError"></div><button class="login-submit" type="submit">登入</button></form><details class="owner-setup"><summary>首次建立最高主管</summary><form id="ownerSetupForm" class="login-section"><input id="ownerDisplayName" autocomplete="name" placeholder="最高主管姓名" required /><input value="ed56671056@gmail.com" type="email" readonly aria-label="最高主管 Email" /><input id="ownerPassword" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="設定至少 6 碼密碼" required /><input id="ownerPasswordConfirm" class="password-input" type="password" minlength="6" autocomplete="new-password" placeholder="再輸入一次密碼" required /><div class="error" id="ownerSetupError"></div><button class="login-submit" type="submit">建立帳號並寄送驗證信</button></form></details>`}
               </div>
             </div>
           </section>
         </div>`;
       document.querySelectorAll('[data-login-mode]').forEach(button => button.addEventListener('click', () => {
-        state.loginMode = button.dataset.loginMode;
-        renderLogin();
+        if (button.dataset.loginMode === 'employee') {
+          state.adminAuthenticated = false;
+          state.managerUser = null;
+          state.view = 'employee';
+          state.tab = 'weekly';
+          render();
+        }
       }));
       const managerLoginForm = document.getElementById('managerLoginForm');
       if (managerLoginForm) managerLoginForm.addEventListener('submit', async event => {
@@ -1994,20 +1989,6 @@
           errorBox.textContent = firebaseAuthErrorMessage(error, error.message || '最高主管帳號建立失敗');
           button.disabled = false;
         }
-      });
-      const employeeLoginForm = document.getElementById('employeeLoginForm');
-      if (employeeLoginForm) employeeLoginForm.addEventListener('submit', event => {
-        event.preventDefault();
-        const password = document.getElementById('employeePassword').value;
-        if (password !== 'B12345') {
-          document.getElementById('employeeLoginError').textContent = '員工密碼錯誤，請重新輸入';
-          return;
-        }
-        state.adminAuthenticated = false;
-        state.managerUser = null;
-        state.view = 'employee';
-        state.tab = 'weekly';
-        render();
       });
       scheduleVerificationCooldownTick();
     }
