@@ -607,6 +607,17 @@
         updatedAt: serverTimestamp()
       }, { merge: false });
     };
+    window.seedFinanceMonthsToCloud = async function seedFinanceMonthsToCloud(entries) {
+      const manager = await verifyManager(firebaseAuth.currentUser);
+      const rows = Array.isArray(entries) ? entries : [];
+      await Promise.all(rows.map(entry => setDoc(doc(firestoreDb, 'finance_months', entry.period), {
+        ...entry.data,
+        period: entry.period,
+        updatedBy: manager.uid,
+        updatedAt: serverTimestamp()
+      }, { merge: false })));
+      return rows.length;
+    };
     window.writeLogToFirestore = async function writeLogToFirestore(data) {
       return addDoc(collection(firestoreDb, 'logs'), {
         ...data,
@@ -1310,27 +1321,58 @@
       state.financeError = isError ? message : '';
       if (state.tab === 'finance') render();
     }
+    function financeCloudRequest(promise, timeoutMs = 8000) {
+      let timer;
+      const timeout = new Promise((resolve, reject) => {
+        timer = setTimeout(() => reject(new Error('雲端同步逾時，請稍後再試')), timeoutMs);
+      });
+      return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timer));
+    }
+    async function seedFinanceHistoryInBackground(missing) {
+      if (!missing.length) return;
+      try {
+        const entries = missing.map(([period, data]) => ({ period, data: cloneData(data) }));
+        if (window.seedFinanceMonthsToCloud) {
+          await window.seedFinanceMonthsToCloud(entries);
+        } else {
+          await Promise.all(entries.map(entry => window.saveFinanceMonthToCloud(entry.period, entry.data)));
+        }
+        if (!state.adminAuthenticated) return;
+        state.financeError = '';
+        state.financeStatus = `雲端同步完成，已補上 ${entries.length} 個月歷史資料`;
+      } catch (error) {
+        console.error('Finance history seed failed:', error);
+        if (!state.adminAuthenticated) return;
+        state.financeError = error.message || '歷史資料上傳失敗';
+        state.financeStatus = `財報已可使用；${state.financeError}`;
+      }
+      if (state.tab === 'finance') render();
+    }
     async function ensureFinanceLoaded() {
-      if (!state.adminAuthenticated || state.financeLoaded || state.financeLoading) return;
+      if (!state.adminAuthenticated || state.financeLoading) return;
       state.financeLoading = true;
       state.financeError = '';
+      state.financeMonths = { ...cloneData(historicalFinanceMonths), ...cloneData(state.financeMonths) };
+      state.financeLoaded = true;
+      const localPeriods = financePeriods();
+      if (!state.financeMonths[state.financeSelectedPeriod]) state.financeSelectedPeriod = localPeriods[localPeriods.length - 1] || '2026-06';
+      state.financeStatus = '已顯示歷史資料，雲端同步中...';
       if (state.tab === 'finance') render();
       try {
-        if (!window.loadFinanceMonthsFromCloud || !window.saveFinanceMonthToCloud) throw new Error('Firebase 財報服務尚未完成載入');
-        const cloudRows = await window.loadFinanceMonthsFromCloud();
+        if (!window.loadFinanceMonthsFromCloud) throw new Error('Firebase 財報服務尚未完成載入');
+        const cloudRows = await financeCloudRequest(window.loadFinanceMonthsFromCloud());
         const cloud = Object.fromEntries((cloudRows || []).map(row => [row.period, row]));
         const missing = Object.entries(historicalFinanceMonths).filter(([period]) => !cloud[period]);
-        for (const [period, data] of missing) {
-          await window.saveFinanceMonthToCloud(period, cloneData(data));
-        }
         state.financeMonths = { ...cloneData(historicalFinanceMonths), ...cloneData(cloud) };
-        state.financeLoaded = true;
         const periods = financePeriods();
         if (!state.financeMonths[state.financeSelectedPeriod]) state.financeSelectedPeriod = periods[periods.length - 1] || '2026-06';
-        state.financeStatus = missing.length ? `已建立 ${missing.length} 個月的簡報歷史資料` : '財報已從雲端同步';
+        state.financeStatus = missing.length ? '財報已從雲端同步，歷史資料正在背景補齊' : '財報已從雲端同步';
+        if (state.tab === 'finance') render();
+        if (missing.length) void seedFinanceHistoryInBackground(missing);
       } catch (error) {
         console.error('Finance load failed:', error);
         state.financeError = error.message || '財報讀取失敗';
+        state.financeStatus = `目前顯示內建歷史資料；${state.financeError}`;
       } finally {
         state.financeLoading = false;
         if (state.tab === 'finance') render();
