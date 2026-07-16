@@ -148,13 +148,6 @@
     .request-main { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .request-pill { border: 1px solid var(--line); border-radius: 999px; background: #f8fafc; padding: 5px 9px; color: #475569; font-size: 12px; font-weight: 900; }
     .request-note { grid-column: 1 / -1; color: #475569; font-size: 13px; line-height: 1.6; }
-    .timeline { min-width: 900px; padding: 14px; }
-    .timeline-grid { display: grid; grid-template-columns: 120px repeat(17, 48px); border-bottom: 1px solid var(--line); }
-    .timeline-grid > div { padding: 8px 4px; font-size: 12px; font-weight: 850; border-right: 1px solid #eef2f7; }
-    .bar-row { display: grid; grid-template-columns: 120px 816px; border-bottom: 1px solid #eef2f7; }
-    .bar-name { padding: 13px 8px; font-size: 13px; font-weight: 950; background: white; }
-    .bar-space { position: relative; height: 48px; }
-    .bar { position: absolute; top: 8px; height: 32px; display: grid; place-items: center; border-radius: 9px; border: 1px solid; font-size: 12px; font-weight: 950; }
     .empty { padding: 48px; text-align: center; color: #94a3b8; font-weight: 900; }
     .toast { position: fixed; right: 18px; bottom: 18px; z-index: 30; max-width: min(360px, calc(100vw - 36px)); border-radius: 14px; background: #0f172a; color: white; padding: 12px 14px; box-shadow: 0 14px 35px rgba(15,23,42,.22); font-size: 13px; font-weight: 900; }
     .login-section { display: grid; gap: 10px; }
@@ -170,7 +163,7 @@
     .finance-month-control { display: flex; align-items: center; gap: 8px; }
     .finance-month-control label { color: #475569; font-size: 12px; font-weight: 900; }
     .finance-month-control select, .finance-month-control input { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 10px; font-weight: 900; }
-    .finance-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: #e8eef5; }
+    .finance-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: #e8eef5; }
     .finance-tab { min-height: 38px; border-radius: 8px; background: transparent; color: #64748b; font-size: 12px; font-weight: 950; }
     .finance-tab.active { background: white; color: #111827; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
     .finance-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -194,6 +187,14 @@
     .finance-number { font-variant-numeric: tabular-nums; font-weight: 900; }
     .chart-box { position: relative; width: 100%; min-height: 260px; }
     .chart-box canvas { width: 100% !important; height: 260px !important; }
+    .plan-comparison-card { overflow: hidden; }
+    .plan-comparison-scroll { width: 100%; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .plan-comparison-frame { position: relative; min-width: max(760px, calc(var(--plan-month-count, 6) * 112px)); height: 410px; }
+    .plan-comparison-frame canvas { width: 100% !important; height: 410px !important; }
+    .plan-comparison-fallback[hidden] { display: none; }
+    .plan-comparison-fallback .finance-table-wrap { min-width: max(760px, calc(var(--plan-month-count, 6) * 112px)); }
+    .plan-comparison-fallback .finance-table { min-width: 760px; }
+    .plan-comparison-fallback [data-plan-value] { font-variant-numeric: tabular-nums; font-weight: 900; }
     .fallback-chart { height: 230px; display: flex; align-items: end; gap: 6px; padding: 12px 4px 24px; border-bottom: 1px solid #cbd5e1; }
     .fallback-bar { flex: 1; min-width: 12px; position: relative; border-radius: 4px 4px 0 0; background: #4f46e5; }
     .fallback-bar strong { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); border: 1px solid #c7d2fe; border-radius: 4px; background: white; color: #312e81; padding: 2px 4px; font-size: 8px; font-weight: 900; white-space: nowrap; }
@@ -332,9 +333,6 @@
       .request-form textarea { grid-column: auto; }
       .request-calendar { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
       .request-day { min-height: 42px; border-radius: 8px; }
-      .timeline { padding: 10px; }
-      .timeline-grid > div { font-size: 11px; }
-      .bar { font-size: 11px; }
       .toast { right: 10px; bottom: 10px; max-width: calc(100vw - 20px); }
       .finance-panel { padding: 8px; }
       .finance-dashboard { gap: 8px; }
@@ -351,6 +349,10 @@
       .finance-card { padding: 10px; }
       .finance-table { min-width: 560px; }
       .chart-box, .chart-box canvas { min-height: 230px; height: 230px !important; }
+      .plan-comparison-card { padding-right: 0; }
+      .plan-comparison-card > h3, .plan-comparison-card > .finance-card-note { margin-right: 10px; }
+      .plan-comparison-frame { min-width: max(760px, calc(var(--plan-month-count, 6) * 112px)); height: 340px; }
+      .plan-comparison-frame canvas { height: 340px !important; }
       .coach-toolbar-head { align-items: stretch; flex-direction: column; }
       .coach-button-list { display: none; }
       .coach-mobile-select { display: block; }
@@ -876,7 +878,6 @@
       view: 'login',
       tab: 'weekly',
       baseDate: new Date(SCHEDULE_START),
-      timelineDate: new Date(),
       quick: null,
       alertsOpen: false,
       controlsOpen: false,
@@ -1467,7 +1468,7 @@
           return `<article class="finance-kpi"><span class="finance-kpi-label">${label}</span><strong class="finance-kpi-value">${financeFormat(value, money)}</strong>${financeDelta(value, financeGet(previous, path))}</article>`;
         }).join('')}</div>
         <div class="finance-grid">
-          <article class="finance-card"><h3>營運績效總覽</h3><p class="finance-card-note">差異由目前月份與上一個月份自動計算</p><div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>項目</th><th>本月</th><th>月差異</th></tr></thead><tbody>${financeMetricRows(current, previous)}</tbody></table></div></article>
+          <article class="finance-card"><h3>營運績效總覽</h3><p class="finance-card-note">差異由目前月份與上一個月份自動計算</p><div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>項目</th><th>本月</th><th>上月差異</th></tr></thead><tbody>${financeMetricRows(current, previous)}</tbody></table></div></article>
           <article class="finance-card"><h3>營收組成趨勢</h3><p class="finance-card-note">單次入場與教練課業績</p><div class="chart-box"><canvas id="financeRevenueChart"></canvas></div></article>
         </div>`;
     }
@@ -1477,9 +1478,33 @@
         ['限時段 788', 'annualLimited788'], ['舊限時段 688', 'annualLimitedLegacy688']
       ];
       return `<div class="finance-grid">
-        <article class="finance-card"><h3>目前有效人數總合</h3><p class="finance-card-note">會員方案現有有效人數</p><div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>方案</th><th>本月</th><th>月差異</th></tr></thead><tbody>${metrics.map(([label, key]) => `<tr><td>${label}</td><td class="finance-number">${financeFormat(current.store.active[key])}</td><td>${financeDelta(current.store.active[key], previous?.store?.active?.[key])}</td></tr>`).join('')}</tbody></table></div></article>
+        <article class="finance-card"><h3>目前有效人數總合</h3><p class="finance-card-note">會員方案現有有效人數</p><div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>方案</th><th>本月</th><th>上月差異</th></tr></thead><tbody>${metrics.map(([label, key]) => `<tr><td>${label}</td><td class="finance-number">${financeFormat(current.store.active[key])}</td><td>${financeDelta(current.store.active[key], previous?.store?.active?.[key])}</td></tr>`).join('')}</tbody></table></div></article>
         <article class="finance-card"><h3>有效會員變動</h3><p class="finance-card-note">2026 年 1 月起各方案走勢</p><div class="chart-box"><canvas id="financeMembersChart"></canvas></div></article>
       </div>`;
+    }
+    function financePlanPeriods() {
+      return financePeriods().filter(period => period >= '2026-01');
+    }
+    function financePlanSeries(periods = financePlanPeriods()) {
+      return [
+        { key: 'single', label: '單次入場', color: '#38bdf8', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.singleEntry?.people)) },
+        { key: 'subscriptions', label: '訂閱', color: '#4f46e5', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.subscriptions)) },
+        { key: 'annual', label: '年約', color: '#f59e0b', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.annualFull888) + financeNumber(state.financeMonths[period]?.store?.active?.annualFullLegacy788)) },
+        { key: 'limited', label: '限時段', color: '#64748b', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.annualLimited788) + financeNumber(state.financeMonths[period]?.store?.active?.annualLimitedLegacy688)) }
+      ];
+    }
+    function renderFinancePlans() {
+      const periods = financePlanPeriods();
+      return `<article class="finance-card plan-comparison-card">
+        <h3>年約／限時段／單次／訂閱差異</h3>
+        <p class="finance-card-note">2026 年 1 月起各方案有效人數與單次入場人次</p>
+        <div class="plan-comparison-scroll">
+          <div class="plan-comparison-frame" style="--plan-month-count:${Math.max(periods.length, 6)}">
+            <canvas id="financePlansChart" role="img" aria-label="各月份方案人數比較圖"></canvas>
+            <div id="financePlansFallback" class="plan-comparison-fallback" hidden></div>
+          </div>
+        </div>
+      </article>`;
     }
     function renderFinanceTrend() {
       const periods = financePeriods().filter(period => period >= '2025-06' && period <= '2026-06');
@@ -1621,6 +1646,35 @@
       if (!window.Chart) return financeFallbackChart(canvas, fallbackLabels, fallbackValues, fallbackFormatter);
       state.financeCharts.push(new window.Chart(canvas, config));
     }
+    function financePlanFallback(canvas, periods, series) {
+      if (!canvas) return;
+      canvas.style.display = 'none';
+      const fallback = document.getElementById('financePlansFallback');
+      if (!fallback) return;
+      fallback.hidden = false;
+      fallback.style.setProperty('--plan-month-count', Math.max(periods.length, 6));
+      fallback.innerHTML = `<div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>月份</th>${series.map(item => `<th>${escapeHtml(item.label)}</th>`).join('')}</tr></thead><tbody>${periods.map((period, periodIndex) => `<tr data-plan-period="${period}"><td>${Number(period.slice(5))}月</td>${series.map(item => `<td data-plan-value="${item.key}">${financeNumber(item.values[periodIndex])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }
+    const financePlanValueLabels = {
+      id: 'financePlanValueLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx, chartArea } = chart;
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          const meta = chart.getDatasetMeta(datasetIndex);
+          if (!meta || meta.hidden) return;
+          meta.data.forEach((bar, valueIndex) => {
+            const label = String(financeNumber(dataset.data[valueIndex]));
+            ctx.save();
+            ctx.fillStyle = '#334155';
+            ctx.font = '800 9px system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(label, bar.x, Math.max(chartArea.top + 12, bar.y - 5));
+            ctx.restore();
+          });
+        });
+      }
+    };
     const coachPointLabelsPlugin = {
       id: 'coachPointLabels',
       afterDatasetsDraw(chart, args, options) {
@@ -1673,6 +1727,45 @@
         const memberLabels = memberPeriods.map(period => period.slice(2).replace('-', '/'));
         const series = [['訂閱','subscriptions','#4f46e5'],['全時段 888','annualFull888','#0f766e'],['限時段 788','annualLimited788','#d97706']];
         createFinanceChart(document.getElementById('financeMembersChart'), { type: 'line', data: { labels: memberLabels, datasets: series.map(([label,key,color]) => ({ label, data: memberPeriods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.[key])), borderColor: color, tension: .25 })) }, options: baseOptions }, memberLabels, memberPeriods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.subscriptions)));
+      }
+      if (state.financeSection === 'plans') {
+        const planPeriods = financePlanPeriods();
+        const planLabels = planPeriods.map(period => `${Number(period.slice(5))}月`);
+        const planSeries = financePlanSeries(planPeriods);
+        const canvas = document.getElementById('financePlansChart');
+        if (!window.Chart) financePlanFallback(canvas, planPeriods, planSeries);
+        else state.financeCharts.push(new window.Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels: planLabels,
+            datasets: planSeries.map(series => ({
+              label: series.label,
+              data: series.values,
+              backgroundColor: series.color,
+              borderColor: series.color,
+              borderWidth: 1,
+              borderRadius: 4,
+              categoryPercentage: .76,
+              barPercentage: .84
+            }))
+          },
+          plugins: [financePlanValueLabels],
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            layout: { padding: { top: 24 } },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 12, padding: 18, font: { size: 11, weight: 'bold' } } },
+              tooltip: { callbacks: { label: context => `${context.dataset.label}：${financeFormat(context.raw)} 人` } }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#475569', font: { weight: 'bold' } } },
+              y: { beginAtZero: true, grace: '15%', grid: { color: 'rgba(148,163,184,.2)' }, ticks: { precision: 0 } }
+            }
+          }
+        }));
       }
       if (state.financeSection === 'trend') {
         const trendPeriods = periods.filter(period => period >= '2025-06' && period <= '2026-06');
@@ -1733,6 +1826,7 @@
       const previous = financePrevious();
       if (state.financeSection === 'accounts' && state.managerUser?.role !== 'owner') state.financeSection = 'overview';
       const sectionContent = state.financeSection === 'members' ? renderFinanceMembers(current, previous)
+        : state.financeSection === 'plans' ? renderFinancePlans()
         : state.financeSection === 'trend' ? renderFinanceTrend()
         : state.financeSection === 'coaches' ? renderFinanceCoaches()
         : state.financeSection === 'manage' ? renderFinanceManage(current)
@@ -1743,6 +1837,7 @@
         <div class="finance-tabs">
           <button class="finance-tab ${state.financeSection === 'overview' ? 'active' : ''}" data-finance-section="overview">營運總覽</button>
           <button class="finance-tab ${state.financeSection === 'members' ? 'active' : ''}" data-finance-section="members">有效會員</button>
+          <button class="finance-tab ${state.financeSection === 'plans' ? 'active' : ''}" data-finance-section="plans">方案差異</button>
           <button class="finance-tab ${state.financeSection === 'trend' ? 'active' : ''}" data-finance-section="trend">13 月趨勢</button>
           <button class="finance-tab ${state.financeSection === 'coaches' ? 'active' : ''}" data-finance-section="coaches">教練績效</button>
           <button class="finance-tab ${state.financeSection === 'manage' ? 'active' : ''}" data-finance-section="manage">資料管理</button>
@@ -1878,7 +1973,6 @@
           <nav>
             <div class="tabs">
               <button class="tab ${state.tab === 'weekly' ? 'active' : ''}" data-tab="weekly">四週班表</button>
-              <button class="tab ${state.tab === 'daily' ? 'active' : ''}" data-tab="daily">每日時間軸</button>
               <button class="tab ${state.tab === 'requests' ? 'active' : ''}" data-tab="requests">${state.view === 'admin' ? '希望班' : '填希望班'}</button>
               ${state.view === 'admin' ? `<button class="tab ${state.tab === 'employees' ? 'active' : ''}" data-tab="employees">員工</button>` : ''}
               ${state.view === 'admin' && state.adminAuthenticated ? `<button class="tab ${state.tab === 'finance' ? 'active' : ''}" data-tab="finance">財報</button>` : ''}
@@ -2074,30 +2168,6 @@
           <button class="danger" style="width:100%; margin-top:10px" data-pick="">清除班別</button>
         </div></div>`);
       document.querySelector('[data-action="filter"]').value = state.filter;
-    }
-    function renderDaily() {
-      const key = formatDate(state.timelineDate);
-      const holiday = holidayName(key);
-      const assigned = state.schedule[key] || {};
-      const working = sortEmployees(state.employees.filter(emp => assigned[emp.id] && shiftInfo(assigned[emp.id])?.work));
-      const hours = Array.from({ length: 17 }, (_, i) => i + 7);
-      const rows = working.map(emp => {
-        const s = shiftInfo(assigned[emp.id]);
-        const cls = shiftClass(s.id);
-        return `<div class="bar-row"><div class="bar-name">${escapeHtml(emp.name)}</div><div class="bar-space"><div class="bar ${cls}" style="left:${(s.start - 7) * 48}px;width:${(s.end - s.start) * 48}px">${s.name} ${s.start}:00-${s.end}:00</div></div></div>`;
-      }).join('');
-      layout(`
-        <section class="panel">
-          <div class="panel-head">
-            <button class="secondary" data-action="prevDay">前一天</button>
-            <div class="range-title">${key}${holiday ? `<div style="color:#dc2626;font-size:12px">${holiday}</div>` : ''}</div>
-            <button class="secondary" data-action="nextDay">後一天</button>
-          </div>
-          <div class="table-wrap"><div class="timeline">
-            <div class="timeline-grid"><div>員工</div>${hours.map(h => `<div>${h}:00</div>`).join('')}</div>
-            ${rows || '<div class="empty">這天尚未安排上班人員</div>'}
-          </div></div>
-        </section>`);
     }
     function renderEmployees() {
       const roleOptions = (selectedRole = '') => roles.map(role => `<option value="${role.id}" ${selectedRole === role.id ? 'selected' : ''}>${role.name}</option>`).join('');
@@ -2305,8 +2375,7 @@
     }
     function render() {
       if (state.view === 'login') return renderLogin();
-      if (state.tab === 'daily') renderDaily();
-      else if (state.tab === 'employees') renderEmployees();
+      if (state.tab === 'employees') renderEmployees();
       else if (state.tab === 'requests') renderRequests();
       else if (state.tab === 'finance' && state.view === 'admin' && state.adminAuthenticated) renderFinance();
       else renderWeekly();
@@ -2540,8 +2609,6 @@
       if (action === 'prev4') { state.baseDate.setDate(state.baseDate.getDate() - scheduleStepDays()); render(); }
       if (action === 'next4') { state.baseDate.setDate(state.baseDate.getDate() + scheduleStepDays()); render(); }
       if (action === 'todayRange') { state.baseDate = new Date(SCHEDULE_START); render(); }
-      if (action === 'prevDay') { state.timelineDate.setDate(state.timelineDate.getDate() - 1); render(); }
-      if (action === 'nextDay') { state.timelineDate.setDate(state.timelineDate.getDate() + 1); render(); }
       if (action === 'print') { printSchedule(); return; }
       if (action === 'html') { exportHtml(); return; }
       if (action === 'exportData') { exportData(); return; }
