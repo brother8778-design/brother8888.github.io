@@ -7,62 +7,72 @@
   <title>FITNESS SCHEDULE - 健身房排班系統</title>
   <style>
     :root {
-      --bg: #eef3f8;
-      --panel: rgba(255,255,255,.96);
-      --line: #b9c6d6;
-      --text: #0f172a;
-      --muted: #64748b;
-      --brand: #4f46e5;
+      --bg: #f3f4f3;
+      --panel: rgba(255,255,255,.97);
+      --line: #d6d3d1;
+      --text: #18181b;
+      --muted: #6b7280;
+      --brand: #e95412;
+      --brand-dark: #b9380d;
+      --brand-soft: #fff1e9;
+      --ink: #18181b;
       --danger: #dc2626;
       --warn-bg: #fffbeb;
       --warn: #92400e;
     }
     * { box-sizing: border-box; }
     html { height: 100%; }
-    body { margin: 0; min-height: 100vh; min-height: 100dvh; background: linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%); color: var(--text); font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif; }
+    body { margin: 0; min-height: 100vh; min-height: 100dvh; background: linear-gradient(180deg, #fafaf9 0%, var(--bg) 100%); color: var(--text); font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif; }
     button, input, select { font: inherit; }
     button { cursor: pointer; border: 0; }
     .app { min-height: 100vh; padding: 12px; }
-    .login { position: relative; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; overflow: hidden; isolation: isolate; background: #08111d url('assets/igym-login-bg.jpg') center / cover no-repeat; padding: 24px; }
-    .login::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(3,10,20,.88) 0%, rgba(3,10,20,.67) 42%, rgba(3,10,20,.26) 100%); }
-    .login-card { width: min(430px, 100%); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; background: rgba(8,17,29,.58); padding: 30px; color: white; box-shadow: 0 24px 70px rgba(0,0,0,.34); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .login { position: relative; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; overflow: hidden; isolation: isolate; background: #18181b url('assets/igym-login-bg.jpg') center / cover no-repeat; padding: 24px; }
+    .login::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(24,24,27,.9) 0%, rgba(58,28,16,.63) 48%, rgba(24,24,27,.3) 100%); }
+    .login-card { width: min(430px, 100%); border: 1px solid rgba(255,255,255,.82); border-top: 4px solid var(--brand); border-radius: 8px; background: rgba(255,255,255,.95); padding: 30px; color: var(--ink); box-shadow: 0 24px 70px rgba(0,0,0,.34); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
     .login-brand { margin-bottom: 22px; }
-    .login-brand-mark { display: block; margin-bottom: 7px; color: #a5b4fc; font-size: 11px; font-weight: 950; letter-spacing: .14em; }
-    .login-brand h1 { color: white; font-size: 25px; }
-    .login-brand .subtitle { margin: 5px 0 0; color: rgba(255,255,255,.68); font-size: 12px; }
-    .login-mode-switch { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,.2); }
-    .login-mode-button { position: relative; min-height: 42px; border-radius: 0; background: transparent; color: rgba(255,255,255,.58); font-size: 13px; font-weight: 900; }
+    .brand-logo { display: block; width: 168px; max-width: 100%; height: auto; object-fit: contain; }
+    .login-brand .brand-logo { margin-bottom: 12px; }
+    .login-brand h1 { color: var(--ink); font-size: 18px; }
+    .login-brand .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .login-mode-switch { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 24px; border-bottom: 1px solid #d6d3d1; }
+    .login-mode-button { position: relative; min-height: 42px; border-radius: 0; background: transparent; color: #78716c; font-size: 13px; font-weight: 900; }
     .login-mode-button::after { content: ''; position: absolute; right: 22%; bottom: -1px; left: 22%; height: 2px; background: transparent; }
-    .login-mode-button.active { color: white; }
-    .login-mode-button.active::after { background: #a5b4fc; }
+    .login-mode-button.active { color: var(--ink); }
+    .login-mode-button.active::after { background: var(--brand); }
     .login-stage { min-height: 202px; }
     .login-panel[hidden], .login-section[hidden] { display: none !important; }
-    .login-card input { width: 100%; border: 0; border-bottom: 1px solid rgba(255,255,255,.42); border-radius: 0; background: transparent; color: white; padding: 14px 2px 12px; text-align: left; font-size: 15px; font-weight: 800; letter-spacing: 0; outline: none; }
-    .login-card input::placeholder { color: rgba(255,255,255,.56); }
-    .login-card input:focus { border-color: #c7d2fe; background: transparent; box-shadow: 0 1px 0 #c7d2fe; }
-    .login-card input:-webkit-autofill { -webkit-text-fill-color: white; transition: background-color 9999s ease-out; }
-    .login-submit { width: 100%; min-height: 46px; margin-top: 4px; border: 1px solid rgba(255,255,255,.28); border-radius: 999px; background: rgba(15,23,42,.78); color: white; font-size: 14px; font-weight: 950; box-shadow: 0 10px 26px rgba(0,0,0,.2); }
-    .login-submit:hover { background: rgba(79,70,229,.86); }
+    .login-card input { width: 100%; border: 0; border-bottom: 1px solid #a8a29e; border-radius: 0; background: transparent; color: var(--ink); padding: 14px 2px 12px; text-align: left; font-size: 15px; font-weight: 800; letter-spacing: 0; outline: none; }
+    .login-card input::placeholder { color: #78716c; }
+    .login-card input:focus { border-color: var(--brand); background: transparent; box-shadow: 0 1px 0 var(--brand); }
+    .login-card input:-webkit-autofill { -webkit-text-fill-color: var(--ink); transition: background-color 9999s ease-out; }
+    .login-submit { width: 100%; min-height: 46px; margin-top: 4px; border: 1px solid var(--brand); border-radius: 999px; background: var(--brand); color: white; font-size: 14px; font-weight: 950; box-shadow: 0 10px 26px rgba(233,84,18,.24); }
+    .login-submit:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
     .login-submit:disabled { cursor: wait; opacity: .65; }
     h1 { margin: 0; font-size: 24px; font-weight: 900; letter-spacing: .02em; }
     .subtitle { margin: 4px 0 26px; color: var(--muted); font-size: 13px; font-weight: 800; }
     .mobile-badge { display: none; }
-    .primary { background: var(--brand); color: white; border-radius: 12px; padding: 10px 14px; font-weight: 900; box-shadow: 0 8px 18px rgba(79,70,229,.18); }
-    .secondary { background: white; color: #334155; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font-weight: 800; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
-    .secondary.active { background: #4f46e5; border-color: #4f46e5; color: white; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgba(233,84,18,.32); outline-offset: 2px; }
+    .primary { background: var(--brand); color: white; border-radius: 12px; padding: 10px 14px; font-weight: 900; box-shadow: 0 8px 18px rgba(233,84,18,.2); }
+    .primary:hover { background: var(--brand-dark); }
+    .secondary { background: white; color: #292524; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font-weight: 800; box-shadow: 0 1px 2px rgba(24,24,27,.04); }
+    .secondary.active { background: var(--brand); border-color: var(--brand); color: white; }
     .danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 10px; padding: 8px 10px; font-weight: 800; }
     .hint { margin-top: 18px; border: 1px solid #eef2f7; border-radius: 14px; background: #f8fafc; padding: 12px; color: var(--muted); text-align: center; font-size: 12px; font-weight: 800; line-height: 1.8; }
     .error { min-height: 20px; margin: 8px 0 12px; color: var(--danger); text-align: center; font-size: 12px; font-weight: 900; }
     .shell { height: calc(100vh - 24px); height: calc(100dvh - 24px); display: flex; flex-direction: column; gap: 12px; }
-    header, nav, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 24px rgba(15,23,42,.06); }
-    header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; }
-    .mode { border: 1px solid var(--line); border-radius: 10px; background: #f8fafc; padding: 7px 10px; color: #475569; font-size: 12px; font-weight: 900; }
+    header, nav, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 24px rgba(24,24,27,.06); }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 3px solid var(--brand); padding: 12px 18px; }
+    .app-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .app-brand-logo { width: 132px; flex: 0 0 auto; }
+    .app-brand h1 { font-size: 17px; }
+    .app-brand .subtitle { margin: 3px 0 0; }
+    .mode { border: 1px solid #fed7c3; border-radius: 10px; background: var(--brand-soft); padding: 7px 10px; color: #9a3412; font-size: 12px; font-weight: 900; }
     .header-actions, .toolbar, .tabs, .quickbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     nav { display: flex; justify-content: space-between; gap: 10px; padding: 8px; }
-    .tabs { background: #e2e8f0; border-radius: 14px; padding: 4px; }
-    .tab { border-radius: 10px; padding: 8px 13px; color: #64748b; font-size: 13px; font-weight: 900; background: transparent; }
-    .tab.active { background: white; color: #0f172a; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
-    .notice { border: 1px solid #c7d2fe; background: #eef2ff; color: #3730a3; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 850; }
+    .tabs { background: #292524; border-radius: 14px; padding: 4px; }
+    .tab { border-radius: 10px; padding: 8px 13px; color: #d6d3d1; font-size: 13px; font-weight: 900; background: transparent; }
+    .tab.active { background: var(--brand); color: white; box-shadow: 0 2px 8px rgba(233,84,18,.24); }
+    .notice { border: 1px solid #fed7c3; background: var(--brand-soft); color: #9a3412; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 850; }
     main { flex: 1; min-height: 0; }
     .panel { height: 100%; overflow: hidden; display: flex; flex-direction: column; }
     .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #eef2f7; background: #f8fafc; }
@@ -75,14 +85,14 @@
     .cloud-pill { border: 1px solid #bfdbfe; border-radius: 999px; background: #eff6ff; color: #1d4ed8; padding: 6px 10px; font-size: 12px; font-weight: 950; }
     .weekly-controls { display: contents; }
     .weekly-controls.collapsed { display: none; }
-    .quickbar { border-bottom: 1px solid #c7d2fe; background: #eef2ff; padding: 8px 12px; overflow-x: auto; }
-    .quickbar span { color: #3730a3; font-size: 12px; font-weight: 950; white-space: nowrap; }
+    .quickbar { border-bottom: 1px solid #fed7c3; background: var(--brand-soft); padding: 8px 12px; overflow-x: auto; }
+    .quickbar span { color: #9a3412; font-size: 12px; font-weight: 950; white-space: nowrap; }
     .chip { border: 1px solid var(--line); border-radius: 10px; background: white; color: #475569; padding: 7px 10px; font-size: 12px; font-weight: 900; white-space: nowrap; }
     .chip.active { outline: 2px solid var(--brand); outline-offset: 1px; }
     .people-filter { display: flex; gap: 7px; align-items: center; overflow-x: auto; border-bottom: 1px solid #dbeafe; background: #f8fafc; padding: 8px 12px; -webkit-overflow-scrolling: touch; }
     .people-filter span { color: #475569; font-size: 12px; font-weight: 950; white-space: nowrap; }
     .person-chip { border: 1px solid #cbd5e1; border-radius: 999px; background: white; color: #334155; padding: 7px 10px; font-size: 12px; font-weight: 900; white-space: nowrap; }
-    .person-chip.active { background: #4f46e5; border-color: #4f46e5; color: white; }
+    .person-chip.active { background: var(--brand); border-color: var(--brand); color: white; }
     .alerts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-top: 8px; color: var(--warn); font-size: 12px; font-weight: 900; }
     .alerts-panel { border-bottom: 1px solid #fde68a; background: var(--warn-bg); padding: 8px 12px; color: var(--warn); }
     .alerts-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #f59e0b; border-radius: 12px; background: #fff7ed; color: var(--warn); padding: 9px 11px; font-size: 12px; font-weight: 950; text-align: left; box-shadow: 0 2px 8px rgba(146,64,14,.08); }
@@ -104,7 +114,7 @@
     .date { color: #64748b; font-size: 10px; font-weight: 950; }
     .dow { font-size: 12px; font-weight: 950; }
     .copy-date { cursor: pointer; }
-    .copy-source { outline: 2px solid #4f46e5; outline-offset: -2px; }
+    .copy-source { outline: 2px solid var(--brand); outline-offset: -2px; }
     .holiday { margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 4px; background: #ef4444; color: white; padding: 1px 2px; font-size: 8px; font-weight: 900; }
     .meeting-label { background: #60a5fa !important; color: #0f172a; }
     .monday { background: #dbeafe !important; }
@@ -142,7 +152,7 @@
     .request-dow { color: #64748b; text-align: center; font-size: 12px; font-weight: 950; }
     .request-day { min-height: 42px; border: 1px solid var(--line); border-radius: 10px; background: white; color: #334155; font-weight: 950; }
     .request-day.blank { visibility: hidden; pointer-events: none; }
-    .request-day.selected { border-color: #4f46e5; background: #4f46e5; color: white; box-shadow: 0 8px 16px rgba(79,70,229,.2); }
+    .request-day.selected { border-color: var(--brand); background: var(--brand); color: white; box-shadow: 0 8px 16px rgba(233,84,18,.2); }
     .request-selected { grid-column: 1 / -1; color: #475569; font-size: 12px; font-weight: 900; }
     .request-card { display: grid; grid-template-columns: 1fr auto; gap: 8px; border-bottom: 1px solid #eef2f7; padding: 14px; background: white; }
     .request-main { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -151,10 +161,10 @@
     .empty { padding: 48px; text-align: center; color: #94a3b8; font-weight: 900; }
     .toast { position: fixed; right: 18px; bottom: 18px; z-index: 30; max-width: min(360px, calc(100vw - 36px)); border-radius: 14px; background: #0f172a; color: white; padding: 12px 14px; box-shadow: 0 14px 35px rgba(15,23,42,.22); font-size: 13px; font-weight: 900; }
     .login-section { display: grid; gap: 10px; }
-    .login-section h2 { margin: 0 0 2px; color: rgba(255,255,255,.76); font-size: 12px; text-align: left; }
+    .login-section h2 { margin: 0 0 2px; color: #57534e; font-size: 12px; text-align: left; }
     .login-section input { letter-spacing: 0; text-align: left; font-size: 15px; }
     .login-section .password-input { letter-spacing: .08em; text-align: left; }
-    .login-card .error { min-height: 18px; margin: 1px 0 0; color: #fecaca; text-align: left; }
+    .login-card .error { min-height: 18px; margin: 1px 0 0; color: var(--danger); text-align: left; }
     .finance-panel { height: 100%; overflow: auto; padding: 14px; background: #f8fafc; }
     .finance-dashboard { width: min(1420px, 100%); margin: 0 auto; display: grid; gap: 12px; }
     .finance-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -163,9 +173,9 @@
     .finance-month-control { display: flex; align-items: center; gap: 8px; }
     .finance-month-control label { color: #475569; font-size: 12px; font-weight: 900; }
     .finance-month-control select, .finance-month-control input { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 9px 10px; font-weight: 900; }
-    .finance-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: #e8eef5; }
-    .finance-tab { min-height: 38px; border-radius: 8px; background: transparent; color: #64748b; font-size: 12px; font-weight: 950; }
-    .finance-tab.active { background: white; color: #111827; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
+    .finance-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; padding: 5px; border: 1px solid #292524; border-radius: 12px; background: #292524; }
+    .finance-tab { min-height: 38px; border-radius: 8px; background: transparent; color: #d6d3d1; font-size: 12px; font-weight: 950; }
+    .finance-tab.active { background: var(--brand); color: white; box-shadow: 0 2px 8px rgba(233,84,18,.24); }
     .finance-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
     .finance-kpi, .finance-card { border: 1px solid #d7e0ea; border-radius: 8px; background: white; box-shadow: 0 5px 16px rgba(15,23,42,.04); }
     .finance-kpi { min-height: 104px; padding: 15px; display: grid; align-content: space-between; gap: 8px; }
@@ -183,7 +193,7 @@
     .finance-table th, .finance-table td { position: static; height: auto; padding: 9px 10px; text-align: right; font-size: 12px; }
     .finance-table th:first-child, .finance-table td:first-child { text-align: left; }
     .finance-table th { background: #f1f5f9; }
-    .finance-table .section-row td { background: #e8eef5; color: #334155; font-weight: 950; text-align: left; }
+    .finance-table .section-row td { background: #f5f5f4; color: #292524; font-weight: 950; text-align: left; }
     .finance-number { font-variant-numeric: tabular-nums; font-weight: 900; }
     .chart-box { position: relative; width: 100%; min-height: 260px; }
     .chart-box canvas { width: 100% !important; height: 260px !important; }
@@ -196,8 +206,8 @@
     .plan-comparison-fallback .finance-table { min-width: 760px; }
     .plan-comparison-fallback [data-plan-value] { font-variant-numeric: tabular-nums; font-weight: 900; }
     .fallback-chart { height: 230px; display: flex; align-items: end; gap: 6px; padding: 12px 4px 24px; border-bottom: 1px solid #cbd5e1; }
-    .fallback-bar { flex: 1; min-width: 12px; position: relative; border-radius: 4px 4px 0 0; background: #4f46e5; }
-    .fallback-bar strong { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); border: 1px solid #c7d2fe; border-radius: 4px; background: white; color: #312e81; padding: 2px 4px; font-size: 8px; font-weight: 900; white-space: nowrap; }
+    .fallback-bar { flex: 1; min-width: 12px; position: relative; border-radius: 4px 4px 0 0; background: var(--brand); }
+    .fallback-bar strong { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); border: 1px solid #fed7c3; border-radius: 4px; background: white; color: #9a3412; padding: 2px 4px; font-size: 8px; font-weight: 900; white-space: nowrap; }
     .fallback-bar span { position: absolute; left: 50%; bottom: -21px; transform: translateX(-50%); color: #64748b; font-size: 8px; font-weight: 900; white-space: nowrap; }
     .trend-values { display: grid; grid-template-columns: repeat(13, minmax(56px, 1fr)); gap: 5px; margin-top: 10px; overflow-x: auto; }
     .trend-point { border: 1px solid #dbe3ed; border-radius: 6px; background: #f8fafc; padding: 6px; text-align: center; }
@@ -208,17 +218,17 @@
     .coach-toolbar-head strong { display: block; font-size: 16px; }
     .coach-button-list { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 5px; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
     .coach-switch { flex: 0 0 auto; border: 1px solid #cbd5e1; border-radius: 8px; background: white; color: #475569; padding: 8px 11px; font-size: 11px; font-weight: 900; white-space: nowrap; }
-    .coach-switch:hover { border-color: #818cf8; color: #3730a3; }
-    .coach-switch.active { border-color: #4f46e5; background: #4f46e5; color: white; box-shadow: 0 5px 12px rgba(79,70,229,.18); }
+    .coach-switch:hover { border-color: var(--brand); color: #9a3412; }
+    .coach-switch.active { border-color: var(--brand); background: var(--brand); color: white; box-shadow: 0 5px 12px rgba(233,84,18,.2); }
     .coach-mobile-select { display: none; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: white; padding: 10px; font-weight: 900; }
     .coach-workspace { display: grid; gap: 12px; }
-    .coach-workspace-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 12px; border-left: 4px solid #4f46e5; background: #eef2ff; }
+    .coach-workspace-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 12px; border-left: 4px solid var(--brand); background: var(--brand-soft); }
     .coach-workspace-title h3 { margin: 0; font-size: 16px; }
-    .coach-workspace-title span { color: #6366f1; font-size: 10px; font-weight: 900; }
+    .coach-workspace-title span { color: #c2410c; font-size: 10px; font-weight: 900; }
     .coach-performance-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .coach-metric-card { min-width: 0; border-top: 3px solid var(--metric-color, #4f46e5); background: var(--metric-soft, #eef2ff); }
-    .coach-metric-card .fallback-bar { background: var(--metric-color, #4f46e5); }
-    .coach-metric-card[data-coach-metric="revenue"] { --metric-color: #4f46e5; --metric-soft: #eef2ff; }
+    .coach-metric-card { min-width: 0; border-top: 3px solid var(--metric-color, #e95412); background: var(--metric-soft, #fff1e9); }
+    .coach-metric-card .fallback-bar { background: var(--metric-color, #e95412); }
+    .coach-metric-card[data-coach-metric="revenue"] { --metric-color: #e95412; --metric-soft: #fff1e9; }
     .coach-metric-card[data-coach-metric="sessions"] { --metric-color: #0f766e; --metric-soft: #ecfdf5; }
     .coach-metric-card[data-coach-metric="attendance"] { --metric-color: #b45309; --metric-soft: #fffbeb; }
     .coach-metric-card[data-coach-metric="trialClasses"] { --metric-color: #be123c; --metric-soft: #fff1f2; }
@@ -242,15 +252,15 @@
     .finance-drop strong, .finance-drop small { display: block; }
     .finance-drop small { margin: 5px 0 10px; color: #64748b; line-height: 1.5; }
     .finance-drop input { width: 100%; }
-    .finance-import-preview { border: 1px solid #c7d2fe; border-radius: 8px; background: #eef2ff; padding: 12px; }
+    .finance-import-preview { border: 1px solid #fed7c3; border-radius: 8px; background: var(--brand-soft); padding: 12px; }
     .finance-import-preview.error { border-color: #fecaca; background: #fef2f2; }
-    .finance-status { border-radius: 8px; padding: 10px 12px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 900; }
+    .finance-status { border-radius: 8px; padding: 10px 12px; background: var(--brand-soft); color: #9a3412; font-size: 12px; font-weight: 900; }
     .finance-status.error { background: #fef2f2; color: #b91c1c; }
-    .owner-setup { margin-top: 16px; border-top: 1px solid rgba(255,255,255,.16); }
-    .owner-setup summary { cursor: pointer; padding: 13px 0 0; color: rgba(255,255,255,.72); text-align: center; font-size: 12px; font-weight: 850; list-style: none; }
+    .owner-setup { margin-top: 16px; border-top: 1px solid #d6d3d1; }
+    .owner-setup summary { cursor: pointer; padding: 13px 0 0; color: #57534e; text-align: center; font-size: 12px; font-weight: 850; list-style: none; }
     .owner-setup summary::-webkit-details-marker { display: none; }
     .owner-setup form { padding-top: 13px; }
-    .owner-setup input[readonly] { color: rgba(255,255,255,.72); }
+    .owner-setup input[readonly] { color: #78716c; }
     .verification-box { display: grid; gap: 9px; margin-top: 12px; border: 1px solid #86efac; border-radius: 12px; background: #f0fdf4; padding: 12px; color: #166534; text-align: center; font-size: 12px; font-weight: 900; line-height: 1.6; }
     .verification-details { border-radius: 9px; background: rgba(255,255,255,.72); padding: 9px; color: #475569; font-size: 11px; line-height: 1.7; }
     .verification-details strong { color: #0f172a; }
@@ -264,7 +274,7 @@
     .manager-account-name span { margin-top: 3px; color: #64748b; font-size: 11px; font-weight: 800; }
     .manager-account-status { display: flex; gap: 6px; flex-wrap: wrap; }
     .account-badge { border-radius: 999px; background: #e2e8f0; color: #475569; padding: 4px 8px; font-size: 10px; font-weight: 950; white-space: nowrap; }
-    .account-badge.owner { background: #ede9fe; color: #5b21b6; }
+    .account-badge.owner { background: var(--brand-soft); color: #9a3412; }
     .account-badge.active { background: #dcfce7; color: #166534; }
     .account-badge.inactive { background: #fee2e2; color: #b91c1c; }
     .account-badge.verified { background: #dbeafe; color: #1d4ed8; }
@@ -273,10 +283,11 @@
     .verification-resend { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: end; margin-top: 10px; border: 1px solid #fde68a; border-radius: 8px; background: #fffbeb; padding: 10px; }
     @media (max-width: 760px) {
       .login { align-items: end; background-position: 62% center; padding: 16px; }
-      .login::before { background: linear-gradient(180deg, rgba(3,10,20,.2) 0%, rgba(3,10,20,.68) 43%, rgba(3,10,20,.94) 100%); }
-      .login-card { width: 100%; max-height: calc(100dvh - 32px); overflow-y: auto; border-radius: 8px; padding: 24px 22px; background: rgba(8,17,29,.64); }
+      .login::before { background: linear-gradient(180deg, rgba(24,24,27,.18) 0%, rgba(58,28,16,.5) 42%, rgba(24,24,27,.84) 100%); }
+      .login-card { width: 100%; max-height: calc(100dvh - 32px); overflow-y: auto; border-radius: 8px; padding: 24px 22px; background: rgba(255,255,255,.96); }
       .login-brand { margin-bottom: 14px; }
-      .login-brand h1 { font-size: 22px; }
+      .login-brand .brand-logo { width: 146px; }
+      .login-brand h1 { font-size: 17px; }
       .login-mode-switch { margin-bottom: 18px; }
       .login-stage { min-height: 190px; }
       .verification-actions { grid-template-columns: 1fr; }
@@ -285,6 +296,9 @@
       .shell { height: calc(100vh - 16px); height: calc(100dvh - 16px); gap: 8px; }
       header { padding: 10px 12px; border-radius: 14px; }
       h1 { font-size: 20px; }
+      .app-brand { gap: 9px; }
+      .app-brand-logo { width: 96px; }
+      .app-brand h1 { font-size: 14px; }
       .subtitle { margin-bottom: 0; font-size: 11px; }
       .mobile-badge { display: inline-flex; width: fit-content; margin-top: 6px; border-radius: 999px; background: #dcfce7; color: #166534; padding: 4px 8px; font-size: 11px; font-weight: 950; }
       header { align-items: flex-start; }
@@ -446,7 +460,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, getDocs } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, onAuthStateChanged, reload, setPersistence, inMemoryPersistence } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { initializeAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, onAuthStateChanged, reload, inMemoryPersistence } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: 'AIzaSyBwypaoiORkxJZqjbg-3XkHwmCHM7vTIZM',
@@ -463,9 +477,8 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const provisioningApp = initializeApp(firebaseConfig, 'igym-admin-provisioning');
     const firestoreDb = getFirestore(firebaseApp);
-    const firebaseAuth = getAuth(firebaseApp);
-    const provisioningAuth = getAuth(provisioningApp);
-    await setPersistence(provisioningAuth, inMemoryPersistence);
+    const firebaseAuth = initializeAuth(firebaseApp, { persistence: inMemoryPersistence });
+    const provisioningAuth = initializeAuth(provisioningApp, { persistence: inMemoryPersistence });
 
     function adminRecord(snapshot, fallback = {}) {
       const data = snapshot?.data?.() || fallback;
@@ -1487,10 +1500,10 @@
     }
     function financePlanSeries(periods = financePlanPeriods()) {
       return [
-        { key: 'single', label: '單次入場', color: '#38bdf8', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.singleEntry?.people)) },
-        { key: 'subscriptions', label: '訂閱', color: '#4f46e5', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.subscriptions)) },
-        { key: 'annual', label: '年約', color: '#f59e0b', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.annualFull888) + financeNumber(state.financeMonths[period]?.store?.active?.annualFullLegacy788)) },
-        { key: 'limited', label: '限時段', color: '#64748b', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.annualLimited788) + financeNumber(state.financeMonths[period]?.store?.active?.annualLimitedLegacy688)) }
+        { key: 'single', label: '單次入場', color: '#e95412', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.singleEntry?.people)) },
+        { key: 'subscriptions', label: '訂閱', color: '#18181b', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.subscriptions)) },
+        { key: 'annual', label: '年約', color: '#d99a20', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.annualFull888) + financeNumber(state.financeMonths[period]?.store?.active?.annualFullLegacy788)) },
+        { key: 'limited', label: '限時段', color: '#0f766e', values: periods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.annualLimited788) + financeNumber(state.financeMonths[period]?.store?.active?.annualLimitedLegacy688)) }
       ];
     }
     function renderFinancePlans() {
@@ -1691,14 +1704,14 @@
           const x = Math.max(chartArea.left, Math.min(point.x - width / 2, chartArea.right - width));
           const y = Math.max(chartArea.top + 2, point.y - 27);
           ctx.fillStyle = 'rgba(255,255,255,.96)';
-          ctx.strokeStyle = options.borderColor || '#c7d2fe';
+          ctx.strokeStyle = options.borderColor || '#fed7c3';
           ctx.lineWidth = 1;
           ctx.beginPath();
           if (typeof ctx.roundRect === 'function') ctx.roundRect(x, y, width, height, 4);
           else ctx.rect(x, y, width, height);
           ctx.fill();
           ctx.stroke();
-          ctx.fillStyle = options.color || '#312e81';
+          ctx.fillStyle = options.color || '#9a3412';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(label, x + width / 2, y + height / 2);
@@ -1720,12 +1733,12 @@
       if (state.financeSection === 'overview') {
         const coaching = periods.map(period => financeNumber(state.financeMonths[period]?.store?.coaching?.totalRevenue));
         const single = periods.map(period => financeNumber(state.financeMonths[period]?.store?.singleEntry?.revenue));
-        createFinanceChart(document.getElementById('financeRevenueChart'), { type: 'line', data: { labels, datasets: [{ label: '教練課業績', data: coaching, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,.12)', tension: .25, fill: true }, { label: '單次入場收入', data: single, borderColor: '#0f766e', backgroundColor: 'transparent', tension: .25 }] }, options: baseOptions }, labels, coaching);
+        createFinanceChart(document.getElementById('financeRevenueChart'), { type: 'line', data: { labels, datasets: [{ label: '教練課業績', data: coaching, borderColor: '#e95412', backgroundColor: 'rgba(233,84,18,.12)', tension: .25, fill: true }, { label: '單次入場收入', data: single, borderColor: '#0f766e', backgroundColor: 'transparent', tension: .25 }] }, options: baseOptions }, labels, coaching);
       }
       if (state.financeSection === 'members') {
         const memberPeriods = periods.filter(period => period >= '2026-01');
         const memberLabels = memberPeriods.map(period => period.slice(2).replace('-', '/'));
-        const series = [['訂閱','subscriptions','#4f46e5'],['全時段 888','annualFull888','#0f766e'],['限時段 788','annualLimited788','#d97706']];
+        const series = [['訂閱','subscriptions','#e95412'],['全時段 888','annualFull888','#0f766e'],['限時段 788','annualLimited788','#d99a20']];
         createFinanceChart(document.getElementById('financeMembersChart'), { type: 'line', data: { labels: memberLabels, datasets: series.map(([label,key,color]) => ({ label, data: memberPeriods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.[key])), borderColor: color, tension: .25 })) }, options: baseOptions }, memberLabels, memberPeriods.map(period => financeNumber(state.financeMonths[period]?.store?.active?.subscriptions)));
       }
       if (state.financeSection === 'plans') {
@@ -1771,14 +1784,14 @@
         const trendPeriods = periods.filter(period => period >= '2025-06' && period <= '2026-06');
         const trendLabels = trendPeriods.map(period => period.slice(2).replace('-', '/'));
         const values = trendPeriods.map(period => financeNumber(state.financeMonths[period]?.store?.coaching?.totalRevenue));
-        createFinanceChart(document.getElementById('financeTrendChart'), { type: 'bar', data: { labels: trendLabels, datasets: [{ label: '教練課總業績', data: values, backgroundColor: '#6366f1', borderRadius: 4 }] }, options: baseOptions }, trendLabels, values);
+        createFinanceChart(document.getElementById('financeTrendChart'), { type: 'bar', data: { labels: trendLabels, datasets: [{ label: '教練課總業績', data: values, backgroundColor: '#e95412', borderRadius: 4 }] }, options: baseOptions }, trendLabels, values);
       }
       if (state.financeSection === 'coaches') {
         const coachId = state.financeCoachId;
         const coachPeriods = coachPerformancePeriods(coachId);
         const coachLabels = coachPeriods.map(period => `${Number(period.slice(5))}月`);
         const metricStyles = {
-          revenue: { color: '#4f46e5', fill: 'rgba(79,70,229,.12)' },
+          revenue: { color: '#e95412', fill: 'rgba(233,84,18,.12)' },
           sessions: { color: '#0f766e', fill: 'rgba(15,118,110,.12)' },
           attendance: { color: '#b45309', fill: 'rgba(180,83,9,.12)' },
           trialClasses: { color: '#be123c', fill: 'rgba(190,18,60,.10)' }
@@ -1964,7 +1977,7 @@
         <div class="app"><div class="shell ${state.topCollapsed ? 'top-collapsed' : ''}">
           <button class="secondary mobile-top-toggle" data-action="toggleTop">${state.topCollapsed ? '展開上方 ▲' : '收合上方 ▼'}</button>
           <header>
-            <div><h1>FITNESS SCHEDULE</h1><div class="subtitle" style="margin:2px 0 0">健身房排班系統 Pro</div><div class="mobile-badge">手機版一週視圖</div></div>
+            <div class="app-brand"><img class="brand-logo app-brand-logo" src="assets/igym-logo.png" alt="IGYM" /><div><h1>排班與營運管理</h1><div class="subtitle">健身房排班系統 Pro</div><div class="mobile-badge">手機版一週視圖</div></div></div>
             <div class="header-actions">
               <span class="mode">模式：${state.view === 'admin' ? '管理者' : '員工檢視'}</span>
               <button class="secondary" data-action="logout">登出</button>
@@ -1988,8 +2001,8 @@
         <div class="login" data-login-view="manager">
           <section class="login-card">
             <div class="login-brand">
-              <span class="login-brand-mark">IGYM</span>
-              <h1>FITNESS SCHEDULE</h1>
+              <img class="brand-logo" src="assets/igym-logo.png" alt="IGYM" />
+              <h1>排班與營運管理</h1>
               <div class="subtitle">健身房排班系統 Pro</div>
             </div>
             <div class="login-mode-switch" role="tablist" aria-label="登入身分">
@@ -2003,8 +2016,11 @@
             </div>
           </section>
         </div>`;
-      document.querySelectorAll('[data-login-mode]').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('[data-login-mode]').forEach(button => button.addEventListener('click', async () => {
         if (button.dataset.loginMode === 'employee') {
+          if (window.signOutFinanceManager) {
+            try { await window.signOutFinanceManager(); } catch (error) { console.warn('Manager session cleanup failed:', error); }
+          }
           state.adminAuthenticated = false;
           state.managerUser = null;
           state.view = 'employee';
@@ -2565,7 +2581,7 @@
         return;
       }
       if (action === 'logout') {
-        if (state.adminAuthenticated && window.signOutFinanceManager) {
+        if (window.signOutFinanceManager) {
           try { await window.signOutFinanceManager(); } catch (error) { console.warn('Manager sign-out failed:', error); }
         }
         clearFinanceCharts();
@@ -2886,19 +2902,8 @@
     window.addEventListener('manager-auth-changed', event => {
       const detail = event.detail || {};
       if (detail.authenticated) {
-        state.adminAuthenticated = true;
-        state.managerUser = detail.user || null;
-        state.ownerVerificationPending = false;
-        state.ownerVerificationEmail = '';
-        state.ownerVerificationResendAt = 0;
-        if (state.view === 'login') {
-          state.view = 'admin';
-          state.tab = 'weekly';
-        }
-        render();
-      } else if (detail.pendingVerification && state.view === 'login') {
-        state.ownerVerificationPending = true;
-        state.ownerVerificationEmail = detail.email || '';
+        if (state.view !== 'admin' || !state.adminAuthenticated) return;
+        state.managerUser = detail.user || state.managerUser;
         render();
       } else if (state.view === 'admin') {
         clearFinanceCharts();
